@@ -12,19 +12,27 @@ namespace CustomerAPI.WebAPI.Controllers
     /// 
     /// </summary>
     [Produces("application/json")]
-    [Route("api/customer/[controller]")]
+    [Route("api/customer")]
     [ApiController]
     public class ContactController : BaseMvpController
     {
+        #region [ Fields / Properties ]
+
         private readonly IUnitOfWorkAsync unitOfWork;
 
         private IRepositoryAsync<Contact> repository
         {
             get
             {
-                return unitOfWork.GetRepositoryAsync<Contact>();
+                return unitOfWork.GetRepository<Contact>();
             }
         }
+
+
+
+        #endregion
+
+        #region [ Ctors ]
 
         /// <summary>
         /// 
@@ -33,6 +41,10 @@ namespace CustomerAPI.WebAPI.Controllers
         {
             unitOfWork = uoW;
         }
+
+        #endregion
+
+        #region [ Actions / Resources ]
 
         /// <summary>
         /// 
@@ -43,13 +55,14 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{customerId:int}/contact", Name = "ContactCreate")]
         public async Task<ActionResult> Create(int customerId, [FromBody] Contact model, CancellationToken cancellationToken)
         {
-            model.CustomerId = customerId;
-
-            await repository.AddAsync(model, cancellationToken);
-
-            if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
+            if (model.IsValid(NotificationContext))
             {
-                Created(nameof(Create), model);
+                model.CustomerId = customerId;
+                await repository.AddAsync(model, cancellationToken);
+                if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
+                {
+                    return Created(nameof(Create), model);
+                }
             }
             return BadRequest();
         }
@@ -63,14 +76,15 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{customerId:int}/contact/{id}", Name = "ContactUpdate")]
         public async Task<ActionResult> Update(int customerId, int id, [FromBody] Contact model, CancellationToken cancellationToken)
         {
-            model.Id = id;
-            model.CustomerId = customerId;
-
-            await repository.ModifyAsync(model, cancellationToken);
-
-            if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
+            if (model.IsValid(NotificationContext))
             {
-                Created(nameof(Update), model);
+                model.Id = id;
+                model.CustomerId = customerId;
+                await repository.ModifyAsync(model, cancellationToken);
+                if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
+                {
+                    return Created(nameof(Update), model);
+                }
             }
             return BadRequest();
         }
@@ -86,20 +100,18 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult> Delete(int customerId, int id, CancellationToken cancellationToken)
         {
             var model = await repository.GetByAsync(x => x.Id == id && x.CustomerId == customerId, cancellationToken);
-
             if (model == null)
             {
                 return NotFound();
             }
-
             await repository.RemoveAsync(model, cancellationToken);
-
             if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
             {
-                Ok();
+                return Ok();
             }
             return BadRequest();
         }
 
+        #endregion
     }
 }

@@ -8,6 +8,8 @@ namespace CustomerAPI.Infrastructure.Builders
     {
         public void Configure(EntityTypeBuilder<Customer> builder)
         {
+            builder.Ignore(p => p.EntityKey);
+
             // customer->id
             builder
                 .HasKey(p => p.Id);
@@ -28,9 +30,12 @@ namespace CustomerAPI.Infrastructure.Builders
             builder
                 .Property(p => p.Active)
                 .IsRequired();
+
             // customer->contacts
             builder
-                .HasMany(p => p.Contacts);
+                .HasMany(p => p.Contacts)
+                .WithOne(p => p.Customer)
+                .HasForeignKey(p => p.CustomerId);
         }
     }
 }

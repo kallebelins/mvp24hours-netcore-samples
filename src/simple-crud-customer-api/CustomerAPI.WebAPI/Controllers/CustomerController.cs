@@ -1,14 +1,17 @@
 ﻿using CustomerAPI.Core.Entities;
+using CustomerAPI.WebAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.Data;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
-using Mvp24Hours.Core.DTOs;
 using Mvp24Hours.Core.DTOs.Models;
 using Mvp24Hours.Core.Extensions;
+using Mvp24Hours.Core.ValueObjects.Logic;
 using Mvp24Hours.Infrastructure.Extensions;
 using Mvp24Hours.WebAPI.Controller;
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,15 +25,21 @@ namespace CustomerAPI.WebAPI.Controllers
     [ApiController]
     public class CustomerController : BaseMvpController
     {
+        #region [ Fields / Properties ]
+
         private readonly IUnitOfWorkAsync unitOfWork;
 
         private IRepositoryAsync<Customer> repository
         {
             get
             {
-                return unitOfWork.GetRepositoryAsync<Customer>();
+                return unitOfWork.GetRepository<Customer>();
             }
         }
+
+        #endregion
+
+        #region [ Ctors ]
 
         /// <summary>
         /// 
@@ -40,6 +49,10 @@ namespace CustomerAPI.WebAPI.Controllers
             unitOfWork = uoW;
         }
 
+        #endregion
+
+        #region [ Actions / Resources ]
+
         /// <summary>
         /// 
         /// </summary>
@@ -47,14 +60,15 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(IPagingResult<IList<Customer>>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Route("", Name = "CustomerGetBy")]
-        public async Task<ActionResult<IPagingResult<IList<Customer>>>> GetBy([FromQuery] Customer filter, [FromQuery] PagingCriteriaRequest clause, CancellationToken cancellationToken)
+        public async Task<ActionResult> GetBy([FromQuery] CustomerFilter model, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
         {
-            var models = await repository.GetByAsync(x => 
-                !filter.Name.HasValue() || x.Name.Contains(filter.Name), 
-                clause.ToPagingService(), 
-                cancellationToken
-            );
-            return models.AnyOrNotNull() ? Ok(models) : NotFound();
+            // filter
+            Expression<Func<Customer, bool>> clause =
+                x => (string.IsNullOrEmpty(model.Name) || x.Name.Contains(model.Name))
+                    && (model.Active == null || x.Active == model.Active);
+            // apply filter with pagination
+            var result = await repository.ToBusinessPagingAsync(clause, pagingCriteria.ToPagingCriteria());
+            return result.Summary.TotalCount > 0 ? Ok(result) : NotFound();
         }
 
         /// <summary>
@@ -66,7 +80,9 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{id}", Name = "CustomerGetById")]
         public async Task<ActionResult> GetById(int id, CancellationToken cancellationToken)
         {
-            var model = await repository.GetByIdAsync(id, cancellationToken);
+            var paging = new PagingCriteriaExpression<Customer>(3, 0);
+            paging.NavigationExpr.Add(x => x.Contacts);
+            var model = await repository.GetByIdAsync(id, paging, cancellationToken);
             return model != null ? Ok(model) : NotFound();
         }
 
@@ -80,10 +96,9 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult> Create([FromBody] Customer model, CancellationToken cancellationToken)
         {
             await repository.AddAsync(model, cancellationToken);
-
             if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
             {
-                Created(nameof(Create), model);
+                return Created(nameof(Create), model);
             }
             return BadRequest();
         }
@@ -98,12 +113,10 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult> Update(int id, [FromBody] Customer model, CancellationToken cancellationToken)
         {
             model.Id = id;
-
             await repository.ModifyAsync(model, cancellationToken);
-
             if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
             {
-                Created(nameof(Update), model);
+                return Created(nameof(Update), model);
             }
             return BadRequest();
         }
@@ -119,20 +132,18 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult> Delete(int id, CancellationToken cancellationToken)
         {
             var model = await repository.GetByIdAsync(id, cancellationToken);
-
             if (model == null)
             {
                 return NotFound();
             }
-
             await repository.RemoveAsync(model, cancellationToken);
-
             if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
             {
-                Ok();
+                return Ok();
             }
             return BadRequest();
         }
 
+        #endregion
     }
 }

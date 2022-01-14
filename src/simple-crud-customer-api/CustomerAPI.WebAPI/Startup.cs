@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mvp24Hours.Infrastructure.Extensions;
 using Mvp24Hours.WebAPI.Extensions;
-using System.Reflection;
 
 namespace CustomerAPI.WebAPI
 {
@@ -36,14 +35,11 @@ namespace CustomerAPI.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             #region [ Mvp24Hours ]
-            services.AddMvp24Hours(Configuration);
-            services.AddMvp24HoursService();
-            services.AddMvp24HoursLogging();
-            services.AddMvp24HoursMapService(Assembly.GetExecutingAssembly());
-            services.AddMvp24HoursNotification();
-            // services.AddMvp24HoursJson();
-            services.AddMvp24HoursSwagger("Customer API", xmlCommentsFileName: "CustomerAPI.WebAPI.xml");
-            services.AddMvp24HoursZipService();
+            services.AddMvp24HoursWeb(Configuration);
+            services.AddMvp24HoursWebFilters();
+            services.AddMvp24HoursWebJson();
+            services.AddMvp24HoursWebSwagger("Customer API", xmlCommentsFileName: "CustomerAPI.WebAPI.xml");
+            services.AddMvp24HoursWebGzip();
             #endregion
 
             services.AddMyDbContext(Configuration);
@@ -61,6 +57,7 @@ namespace CustomerAPI.WebAPI
             // check environment
             app.UseMvp24HoursExceptionHandling();
 
+            // automatic migration
             db.Database.EnsureCreated();
 
             app.UseStaticFiles();

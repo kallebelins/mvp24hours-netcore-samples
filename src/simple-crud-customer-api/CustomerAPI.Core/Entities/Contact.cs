@@ -8,10 +8,13 @@ namespace CustomerAPI.Core.Entities
     public class Contact : EntityBase<Contact, int>
     {
         public DateTime Created { get; set; }
+        [JsonIgnore]
         public int CustomerId { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public ContactType Type { get; set; }
         public string Description { get; set; }
         public bool Active { get; set; }
+
+        public Customer Customer { get; set; }
     }
 }

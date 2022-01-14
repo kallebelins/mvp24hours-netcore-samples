@@ -33,6 +33,12 @@ namespace CustomerAPI.Infrastructure.Builders
             builder
                 .Property(p => p.Active)
                 .IsRequired();
+
+            // contact->customer
+            builder
+                .HasOne(p => p.Customer)
+                .WithMany(p => p.Contacts)
+                .HasForeignKey(p => p.CustomerId);
         }
     }
 }
