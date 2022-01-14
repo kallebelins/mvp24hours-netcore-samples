@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.Data;
+using Mvp24Hours.Extensions;
 using Mvp24Hours.WebAPI.Controller;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,7 +56,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{customerId:int}/contact", Name = "ContactCreate")]
         public async Task<ActionResult> Create(int customerId, [FromBody] Contact model, CancellationToken cancellationToken)
         {
-            if (model.IsValid(NotificationContext))
+            if (model.Validate())
             {
                 model.CustomerId = customerId;
                 await repository.AddAsync(model, cancellationToken);
@@ -76,7 +77,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{customerId:int}/contact/{id}", Name = "ContactUpdate")]
         public async Task<ActionResult> Update(int customerId, int id, [FromBody] Contact model, CancellationToken cancellationToken)
         {
-            if (model.IsValid(NotificationContext))
+            if (model.Validate())
             {
                 model.Id = id;
                 model.CustomerId = customerId;

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Mvp24Hours.Infrastructure.Extensions;
+using Mvp24Hours.Extensions;
 using Mvp24Hours.WebAPI.Extensions;
 
 namespace CustomerAPI.WebAPI
@@ -34,17 +34,8 @@ namespace CustomerAPI.WebAPI
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
-            #region [ Mvp24Hours ]
-            services.AddMvp24HoursWeb(Configuration);
-            services.AddMvp24HoursWebFilters();
-            services.AddMvp24HoursWebJson();
-            services.AddMvp24HoursWebSwagger("Customer API", xmlCommentsFileName: "CustomerAPI.WebAPI.xml");
-            services.AddMvp24HoursWebGzip();
-            #endregion
-
+            services.AddMyServices(Configuration);
             services.AddMyDbContext(Configuration);
-            services.AddMyServices();
-
             services.AddControllers();
             services.AddMvc();
         }

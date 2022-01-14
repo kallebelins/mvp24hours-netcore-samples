@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.Data;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.DTOs.Models;
-using Mvp24Hours.Core.Extensions;
 using Mvp24Hours.Core.ValueObjects.Logic;
-using Mvp24Hours.Infrastructure.Extensions;
+using Mvp24Hours.Extensions;
 using Mvp24Hours.WebAPI.Controller;
 using System;
 using System.Collections.Generic;
@@ -95,10 +94,13 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("", Name = "CustomerCreate")]
         public async Task<ActionResult> Create([FromBody] Customer model, CancellationToken cancellationToken)
         {
-            await repository.AddAsync(model, cancellationToken);
-            if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
+            if (model.Validate())
             {
-                return Created(nameof(Create), model);
+                await repository.AddAsync(model, cancellationToken);
+                if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
+                {
+                    return Created(nameof(Create), model);
+                }
             }
             return BadRequest();
         }
@@ -112,11 +114,14 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{id}", Name = "CustomerUpdate")]
         public async Task<ActionResult> Update(int id, [FromBody] Customer model, CancellationToken cancellationToken)
         {
-            model.Id = id;
-            await repository.ModifyAsync(model, cancellationToken);
-            if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
+            if (model.Validate())
             {
-                return Created(nameof(Update), model);
+                model.Id = id;
+                await repository.ModifyAsync(model, cancellationToken);
+                if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
+                {
+                    return Created(nameof(Update), model);
+                }
             }
             return BadRequest();
         }

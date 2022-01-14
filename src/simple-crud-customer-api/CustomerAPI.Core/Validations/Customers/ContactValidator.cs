@@ -1,7 +1,7 @@
 ﻿using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Enums;
 using FluentValidation;
-using Mvp24Hours.Core.Extensions;
+using Mvp24Hours.Extensions;
 
 namespace CustomerAPI.Core.Validations.Customers
 {
