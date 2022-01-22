@@ -1,2 +1,3 @@
 # mvp24hours-netcore-samples
 Samples for quick product building using: Relational database (SQL Server, PostgreSql, MySql); NoSql database (MongoDb); Key-value database (Redis); Message Broker (RabbitMQ); Pipeline (Pipe and Filters pattern); Documentation (Swagger); Mapping (AutoMapper); Logging (NLog); Patterns for data validation (FluentValidation and Data Annotations), notification (Notification pattern) and specifications (Specification pattern), unit of work, repository, among others.
+In each project there is a file with the description of the resources and implemented references. Read the "Readme.md" file in the "...WebAPI" folder.

@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CustomerAPI.WebAPI</name>
+    </assembly>
+    <members>
+        <member name="T:CustomerAPI.WebAPI.Controllers.CustomerController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.GetBy(CustomerAPI.Core.DTOs.Filters.CustomerFilterDto,Mvp24Hours.Core.DTOs.Models.PagingCriteriaRequest)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.GetById(System.Int32)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.Create(CustomerAPI.Core.DTOs.Creates.CustomerCreateDto)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.Update(System.Int32,CustomerAPI.Core.DTOs.Updates.CustomerUpdateDto)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.Delete(System.Int32)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:CustomerAPI.WebAPI.Controllers.ProductController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.ProductController.List(Mvp24Hours.Core.ValueObjects.Logic.PagingCriteria)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.ProductController.GetById(System.Int32)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyDbContext(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddDocumentation(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:CustomerAPI.WebAPI.Program">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Program.Main(System.String[])">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:CustomerAPI.WebAPI.Startup">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            
+            </summary>
+            <param name="configuration"></param>
+        </member>
+        <member name="P:CustomerAPI.WebAPI.Startup.Configuration">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,CustomerAPI.Infrastructure.DataDbContext)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+        </member>
+    </members>
+</doc>
