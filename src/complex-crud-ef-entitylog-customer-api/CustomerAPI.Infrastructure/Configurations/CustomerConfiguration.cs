@@ -17,6 +17,21 @@ namespace CustomerAPI.Infrastructure.Builders
             builder
                 .Property(p => p.Created)
                 .IsRequired();
+            // contact->createdby
+            builder
+                .Property(p => p.CreatedBy);
+            // contact->modified
+            builder
+                .Property(p => p.Modified);
+            // contact->modifiedby
+            builder
+                .Property(p => p.ModifiedBy);
+            // contact->removed
+            builder
+                .Property(p => p.Removed);
+            // contact->removedby
+            builder
+                .Property(p => p.RemovedBy);
             // customer->name
             builder
                 .Property(p => p.Name)

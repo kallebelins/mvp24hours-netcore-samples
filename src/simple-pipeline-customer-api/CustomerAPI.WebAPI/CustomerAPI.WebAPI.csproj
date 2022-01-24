@@ -11,8 +11,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-		<PackageReference Include="Mvp24Hours.Infrastructure.Pipe" Version="3.1.201" />
-		<PackageReference Include="Mvp24Hours.WebAPI" Version="3.1.201" />
+		<PackageReference Include="Mvp24Hours.Infrastructure.Pipe" Version="3.1.242" />
+		<PackageReference Include="Mvp24Hours.WebAPI" Version="3.1.242" />
 	</ItemGroup>
 
 	<ItemGroup>

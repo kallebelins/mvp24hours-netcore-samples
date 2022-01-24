@@ -102,7 +102,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{id}", Name = "CustomerUpdate")]
         public ActionResult Update(int id, [FromBody] UpdateCustomerRequest model)
         {
-            //model.Id = id;
+            model.Id = id;
             updateProducer.Publish(model);
             return Created(nameof(Create), model.Token);
         }

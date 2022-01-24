@@ -30,7 +30,7 @@ namespace CustomerAPI.WebAPI.Extensions
         /// <summary>
         /// 
         /// </summary>
-        public static IServiceCollection AddMyServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddMyServices(this IServiceCollection services)
         {
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IContactService, ContactService>();

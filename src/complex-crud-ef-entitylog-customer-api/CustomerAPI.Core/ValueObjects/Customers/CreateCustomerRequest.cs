@@ -13,7 +13,8 @@ namespace CustomerAPI.Core.ValueObjects.Customers
         public virtual void Mapping(Profile profile)
         {
             profile.CreateMap<CreateCustomerRequest, Customer>()
-                .ForMember(x => x.Created, opt => opt.MapFrom(y => DateTime.Now));
+                .ForMember(x => x.Created, opt => opt.MapFrom(y => DateTime.Now))
+                .ForMember(x => x.Active, opt => opt.MapFrom(y => true));
         }
     }
 }

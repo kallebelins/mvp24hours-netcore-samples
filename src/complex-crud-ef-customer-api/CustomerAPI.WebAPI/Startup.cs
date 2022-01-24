@@ -43,7 +43,7 @@ namespace CustomerAPI.WebAPI
             services.AddMvp24HoursWebGzip();
             #endregion
 
-            services.AddMyServices(Configuration);
+            services.AddMyServices();
             services.AddMyDbContext(Configuration);
 
             services.AddControllers();

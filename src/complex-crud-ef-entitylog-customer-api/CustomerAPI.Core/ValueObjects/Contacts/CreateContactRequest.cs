@@ -14,7 +14,8 @@ namespace CustomerAPI.Core.ValueObjects.Contacts
         public virtual void Mapping(Profile profile)
         {
             profile.CreateMap<CreateContactRequest, Contact>()
-                .ForMember(x => x.Created, opt => opt.MapFrom(y => DateTime.Now));
+                .ForMember(x => x.Created, opt => opt.MapFrom(y => DateTime.Now))
+                .ForMember(x => x.Active, opt => opt.MapFrom(y => true));
         }
     }
 }

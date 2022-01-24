@@ -6,7 +6,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Mvp24Hours.Application" Version="3.1.201" />
+		<PackageReference Include="Mvp24Hours.Application" Version="3.1.242" />
 	</ItemGroup>
 
 	<ItemGroup>

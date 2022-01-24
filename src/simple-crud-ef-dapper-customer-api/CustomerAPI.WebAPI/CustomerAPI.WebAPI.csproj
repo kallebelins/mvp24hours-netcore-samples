@@ -12,7 +12,7 @@
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-		<PackageReference Include="Mvp24Hours.WebAPI" Version="3.1.201" />
+		<PackageReference Include="Mvp24Hours.WebAPI" Version="3.1.242" />
 		<PackageReference Include="MySql.EntityFrameworkCore" Version="5.0.8" />
 	</ItemGroup>
 

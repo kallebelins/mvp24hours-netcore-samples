@@ -1,6 +1,5 @@
 ﻿using CustomerAPI.Core.Enums;
 using Mvp24Hours.Core.Entities;
-using System;
 using System.Text.Json.Serialization;
 
 namespace CustomerAPI.Core.Entities

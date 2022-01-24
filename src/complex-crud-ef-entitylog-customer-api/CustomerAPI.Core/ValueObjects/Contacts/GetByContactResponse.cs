@@ -10,6 +10,7 @@ namespace CustomerAPI.Core.ValueObjects.Contacts
     public class GetByContactResponse : IMapFrom<Contact>
     {
         public DateTime Created { get; set; }
+        public DateTime? Modified { get; set; }
         public ContactType Type { get; set; }
         public string Description { get; set; }
         public bool Active { get; set; }

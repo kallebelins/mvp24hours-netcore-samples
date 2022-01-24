@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using CustomerAPI.Core.Entities;
-using CustomerAPI.Core.Enums;
 using Mvp24Hours.Core.Contract.Mappings;
-using System;
 
 namespace CustomerAPI.Core.ValueObjects.Contacts
 {

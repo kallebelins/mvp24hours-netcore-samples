@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Domains", "01 - Domain
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerAPI.Core", "CustomerAPI.Core\CustomerAPI.Core.csproj", "{2B9BDCFE-F26F-4BD5-AA57-F439771C3D50}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03 - Presentations", "03 - Presentations", "{C6FDF956-F9D7-4304-BDF7-99B1F3DE5F01}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Presentations", "02 - Presentations", "{C6FDF956-F9D7-4304-BDF7-99B1F3DE5F01}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerAPI.WebAPI", "CustomerAPI.WebAPI\CustomerAPI.WebAPI.csproj", "{01D09831-5AD8-4AB5-B453-85C1A56FEF89}"
 EndProject
