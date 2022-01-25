@@ -2,9 +2,13 @@
 Samples for quick product building using: Relational database (SQL Server, PostgreSql, MySql); NoSql database (MongoDb); Key-value database (Redis); Message Broker (RabbitMQ); Pipeline (Pipe and Filters pattern); Documentation (Swagger); Mapping (AutoMapper); Logging (NLog); Patterns for data validation (FluentValidation and Data Annotations), notification (Notification pattern) and specifications (Specification pattern), unit of work, repository, among others.
 In each project there is a file with the description of the resources and implemented references. Read the "Readme.md" file in the "...WebAPI" folder.
 
-
 ## Study, share and contribute:
 Visit: https://mvp24hours.dev/
+
+## Templates for Visual Studio 2019 and 2022
+Visit: https://github.com/kallebelins/mvp24hours-netcore-samples/tree/main/vstemplate
+
+![Templates for Visual Studio 2019 and 2022](https://raw.githubusercontent.com/kallebelins/mvp24hours-netcore-samples/main/images/mvp24hours-netcore-samples-resume.png)
 
 ## Projects - NLayers
 
@@ -35,6 +39,7 @@ Allows you to search with pagination, get an item, create, change and delete. Op
 
 #### Pipeline
 **[Pipeline - Simple](https://github.com/kallebelins/mvp24hours-netcore-samples/tree/main/src/simple-pipeline-customer-api/CustomerAPI.WebAPI)**
+Pipeline pattern with simple operations.
 
 ### Complex
 N-tier project used to develop APIs where the business needs to apply complex rules, higher level of security, less data traffic, validation of sensitive data and separation of responsibilities or consumption by other technologies and projects.
