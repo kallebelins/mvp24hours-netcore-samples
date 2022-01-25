@@ -4,8 +4,11 @@ using Mvp24Hours.Helpers;
 using Mvp24Hours.Infrastructure.Pipe.Operations;
 using System.Threading.Tasks;
 
-namespace CustomerAPI.Typicode.Application.Pipe.Operations.Customers
+namespace CustomerAPI.Application.Pipe.Operations.Customers
 {
+    /// <summary>
+    /// Mediator to get Typicode service clients/users
+    /// </summary>
     public class GetCustomerClientStep : OperationBaseAsync
     {
         public override async Task<IPipelineMessage> ExecuteAsync(IPipelineMessage input)
