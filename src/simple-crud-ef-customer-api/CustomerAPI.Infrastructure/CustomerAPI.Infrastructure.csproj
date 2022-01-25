@@ -11,9 +11,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Core\Mvp24Hours.Core.csproj" />
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Infrastructure.Data.EFCore\Mvp24Hours.Infrastructure.Data.EFCore.csproj" />
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Infrastructure\Mvp24Hours.Infrastructure.csproj" />
 		<ProjectReference Include="..\CustomerAPI.Core\CustomerAPI.Core.csproj" />
 	</ItemGroup>
 

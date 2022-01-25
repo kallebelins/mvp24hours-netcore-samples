@@ -6,16 +6,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Mvp24Hours.Application" Version="3.1.242" />
-	  <PackageReference Include="Mvp24Hours.Infrastructure.RabbitMQ" Version="3.1.242" />
+	  <PackageReference Include="Mvp24Hours.Application" Version="3.1.243" />
+	  <PackageReference Include="Mvp24Hours.Infrastructure.RabbitMQ" Version="3.1.243" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Application\Mvp24Hours.Application.csproj" />
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Core\Mvp24Hours.Core.csproj" />
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Infrastructure.Data.EFCore\Mvp24Hours.Infrastructure.Data.EFCore.csproj" />
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Infrastructure.RabbitMQ\Mvp24Hours.Infrastructure.RabbitMQ.csproj" />
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Infrastructure\Mvp24Hours.Infrastructure.csproj" />
 		<ProjectReference Include="..\CustomerAPI.Core\CustomerAPI.Core.csproj" />
 		<ProjectReference Include="..\CustomerAPI.Infrastructure\CustomerAPI.Infrastructure.csproj" />
 	</ItemGroup>

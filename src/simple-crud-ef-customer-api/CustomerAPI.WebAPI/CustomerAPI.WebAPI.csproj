@@ -6,7 +6,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DocumentationFile>C:\Fabrica\GitHub\mvp24hours-netcore-vue\src\CustomerAPI\CustomerAPI.WebAPI\CustomerAPI.WebAPI.xml</DocumentationFile>
+		<DocumentationFile>.\CustomerAPI.WebAPI.xml</DocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,10 +16,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Core\Mvp24Hours.Core.csproj" />
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Infrastructure.Data.EFCore\Mvp24Hours.Infrastructure.Data.EFCore.csproj" />
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Infrastructure\Mvp24Hours.Infrastructure.csproj" />
-		<ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.WebAPI\Mvp24Hours.WebAPI.csproj" />
 		<ProjectReference Include="..\CustomerAPI.Core\CustomerAPI.Core.csproj" />
 		<ProjectReference Include="..\CustomerAPI.Infrastructure\CustomerAPI.Infrastructure.csproj" />
 	</ItemGroup>

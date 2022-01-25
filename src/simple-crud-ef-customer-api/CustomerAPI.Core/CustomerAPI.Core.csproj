@@ -11,10 +11,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\..\mvp24hours-netcore\src\Mvp24Hours.Core\Mvp24Hours.Core.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Compile Update="Resources\Messages.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
