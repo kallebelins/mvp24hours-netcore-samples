@@ -75,7 +75,7 @@ We generally use it for service integration. The pipeline concept is excellent f
 Please consider donating if you think this library is useful to you or that my work is valuable. Glad if you can help me [buy a cup of coffee](https://www.paypal.com/donate/?hosted_button_id=EKA2L256GJVQC). :heart:
 
 ## Community
-Users and development team will be created on Discord soon.
+Users, stakeholders, students, enthusiasts, developers, programmers [connect on discord](https://discord.gg/u3jeH6sY) to follow our growth closely!
 
 ## Sponsors
 Be a sponsor by choosing this project to accelerate your products.
