@@ -51,6 +51,9 @@ Allows you to search with pagination, get an item, create, change and delete.
 **[CRUD - EF - Dapper - Complex](https://github.com/kallebelins/mvp24hours-netcore-samples/tree/main/src/complex-crud-ef-dapper-customer-api/CustomerAPI.WebAPI)**
 Allows you to search with pagination and get an item (with navigation) using Dapper. The operations to create, change and delete are performed with EF.
 
+**[CRUD - EF - Only Entity - Complex](https://github.com/kallebelins/mvp24hours-netcore-samples/tree/main/src/complex-crud-ef-only-entity-customer-api/CustomerAPI.WebAPI)**
+Allows you to search with pagination, get an item, create, change and delete. We do not create object for traffic and mapping. We use the database entity itself.
+
 **[CRUD - EF - Entity Log - Complex](https://github.com/kallebelins/mvp24hours-netcore-samples/tree/main/src/complex-crud-ef-entitylog-customer-api/CustomerAPI.WebAPI)**
 Allows you to search with pagination, get an item, create, change and delete.
 
