@@ -58,9 +58,9 @@ namespace CustomerAPI.WebAPI.Extensions
         /// </summary>
         public static IServiceCollection AddMyRabbitConsumer(this IServiceCollection services)
         {
-            services.AddScoped<IMvpRabbitMQConsumer<CreateCustomerRequest>, CreateCustomerConsumer>();
-            services.AddScoped<IMvpRabbitMQConsumer<UpdateCustomerRequest>, UpdateCustomerConsumer>();
-            services.AddScoped<IMvpRabbitMQConsumer<DeleteCustomerRequest>, DeleteCustomerConsumer>();
+            services.AddScoped<IMvpRabbitMQConsumerAsync<CreateCustomerRequest>, CreateCustomerConsumerAsync>();
+            services.AddScoped<IMvpRabbitMQConsumerAsync<UpdateCustomerRequest>, UpdateCustomerConsumerAsync>();
+            services.AddScoped<IMvpRabbitMQConsumerAsync<DeleteCustomerRequest>, DeleteCustomerConsumerAsync>();
             return services;
         }
 
@@ -71,13 +71,13 @@ namespace CustomerAPI.WebAPI.Extensions
         {
             services.AddMvp24HoursHostedService((e) =>
             {
-                var createConsumer = ServiceProviderHelper.GetService<IMvpRabbitMQConsumer<CreateCustomerRequest>>();
+                var createConsumer = ServiceProviderHelper.GetService<IMvpRabbitMQConsumerAsync<CreateCustomerRequest>>();
                 createConsumer?.Consume();
 
-                var updateConsumer = ServiceProviderHelper.GetService<IMvpRabbitMQConsumer<UpdateCustomerRequest>>();
+                var updateConsumer = ServiceProviderHelper.GetService<IMvpRabbitMQConsumerAsync<UpdateCustomerRequest>>();
                 updateConsumer?.Consume();
 
-                var deteleConsumer = ServiceProviderHelper.GetService<IMvpRabbitMQConsumer<DeleteCustomerRequest>>();
+                var deteleConsumer = ServiceProviderHelper.GetService<IMvpRabbitMQConsumerAsync<DeleteCustomerRequest>>();
                 deteleConsumer?.Consume();
             });
             return services;

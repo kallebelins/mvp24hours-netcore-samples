@@ -1,13 +1,15 @@
 using CustomerAPI.Core.ValueObjects.Customers;
 using Mvp24Hours.Infrastructure.RabbitMQ;
+using RabbitMQ.Client.Events;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace CustomerAPI.Application.Brokers.Consumers
 {
-    public class CreateCustomerConsumer : MvpRabbitMQConsumer<CreateCustomerRequest>
+    public class CreateCustomerConsumerAsync : MvpRabbitMQConsumerAsync<CreateCustomerRequest>
     {
-        public override async Task Received(CreateCustomerRequest message)
+        public override async Task ReceivedAsync(CreateCustomerRequest message)
         {
             if (message == null)
             {

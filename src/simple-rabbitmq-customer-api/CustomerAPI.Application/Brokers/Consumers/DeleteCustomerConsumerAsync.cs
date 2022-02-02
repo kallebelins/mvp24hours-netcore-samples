@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace CustomerAPI.Application.Brokers.Consumers
 {
-    public class DeleteCustomerConsumer : MvpRabbitMQConsumer<DeleteCustomerRequest>
+    public class DeleteCustomerConsumerAsync : MvpRabbitMQConsumerAsync<DeleteCustomerRequest>
     {
-        public override async Task Received(DeleteCustomerRequest message)
+        public override async Task ReceivedAsync(DeleteCustomerRequest message)
         {
             if (message == null)
             {

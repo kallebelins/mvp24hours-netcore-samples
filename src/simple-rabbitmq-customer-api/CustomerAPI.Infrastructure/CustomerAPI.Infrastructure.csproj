@@ -7,7 +7,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-		<PackageReference Include="Mvp24Hours.Infrastructure.Data.EFCore" Version="3.1.243" />
+		<PackageReference Include="Mvp24Hours.Infrastructure.Data.EFCore" Version="3.2.21" />
 	</ItemGroup>
 
 	<ItemGroup>

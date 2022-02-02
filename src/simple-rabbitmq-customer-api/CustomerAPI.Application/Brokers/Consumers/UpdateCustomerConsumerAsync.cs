@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace CustomerAPI.Application.Brokers.Consumers
 {
-    public class UpdateCustomerConsumer : MvpRabbitMQConsumer<UpdateCustomerRequest>
+    public class UpdateCustomerConsumerAsync : MvpRabbitMQConsumerAsync<UpdateCustomerRequest>
     {
-        public override async Task Received(UpdateCustomerRequest message)
+        public override async Task ReceivedAsync(UpdateCustomerRequest message)
         {
             if (message == null)
             {
