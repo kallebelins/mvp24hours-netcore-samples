@@ -3,13 +3,15 @@ using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Resources;
 using CustomerAPI.Core.Specifications.Customers;
 using CustomerAPI.Core.ValueObjects.Customers;
+using FluentValidation;
 using Mvp24Hours.Application.Logic;
 using Mvp24Hours.Core.Contract.Data;
+using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
+using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
 using Mvp24Hours.Core.ValueObjects.Logic;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -20,75 +22,70 @@ namespace CustomerAPI.Application.Logic
 {
     public class CustomerService : RepositoryPagingServiceAsync<Customer, IUnitOfWorkAsync>, ICustomerService
     {
+        #region [ Ctor ]
+
+        public CustomerService(IUnitOfWorkAsync unitOfWork, ILoggingService logging, INotificationContext notification, IValidator<Customer> validator)
+            : base(unitOfWork, logging, notification, validator)
+        {
+        }
+
+        #endregion
+
         #region [ Queries ]
 
-        public async Task<IPagingResult<IList<Customer>>> GetBy(CustomerFilterModel model, IPagingCriteria criteria, CancellationToken cancellationToken = default)
+        public async Task<IPagingResult<IList<Customer>>> GetBy(CustomerQuery model, IPagingCriteria criteria, CancellationToken cancellationToken = default)
         {
-            try
+            // apply filter default
+            Expression<Func<Customer, bool>> clause =
+                x => (string.IsNullOrEmpty(model.Name) || x.Name.Contains(model.Name))
+                    && (model.Active == null || model.Active.Value);
+
+            // has cell
+            if (model.HasCellContact)
             {
-                // apply filter default
-                Expression<Func<Customer, bool>> clause =
-                    x => (string.IsNullOrEmpty(model.Name) || x.Name.Contains(model.Name))
-                        && (model.Active == null || model.Active.Value);
-
-                // has cell
-                if (model.HasCellContact)
-                {
-                    clause = clause.And<Customer, CustomerHasCellContactSpec>();
-                }
-
-                // has email
-                if (model.HasEmailContact)
-                {
-                    clause = clause.And<Customer, CustomerHasEmailContactSpec>();
-                }
-
-                // has no
-                if (model.HasNoContact)
-                {
-                    clause = clause.And<Customer, CustomerHasNoContactSpec>();
-                }
-
-                // is prospect
-                if (model.IsProspect)
-                {
-                    clause = clause.And<Customer, CustomerIsPropectSpec>();
-                }
-
-                // checks if there are any records in the database from the filter
-                if (!await Repository.GetByAnyAsync(clause, cancellationToken: cancellationToken))
-                {
-                    // reply with standard message for record not found
-                    return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
-                        .ToBusinessPaging<IList<Customer>>();
-                }
-
-                // apply filter with pagination
-                return await GetByWithPaginationAsync(clause, criteria, cancellationToken: cancellationToken);
+                clause = clause.And<Customer, CustomerHasCellContactSpec>();
             }
-            catch (Exception ex)
+
+            // has email
+            if (model.HasEmailContact)
             {
-                Logging.Error(ex);
-                throw ex;
+                clause = clause.And<Customer, CustomerHasEmailContactSpec>();
             }
+
+            // has no
+            if (model.HasNoContact)
+            {
+                clause = clause.And<Customer, CustomerHasNoContactSpec>();
+            }
+
+            // is prospect
+            if (model.IsProspect)
+            {
+                clause = clause.And<Customer, CustomerIsPropectSpec>();
+            }
+
+            // try to get paginated data with criteria
+            var result = await GetByWithPaginationAsync(clause, criteria, cancellationToken: cancellationToken);
+
+            // checks if there are any records in the database from the filter
+            if (!result.HasData())
+            {
+                // reply with standard message for record not found
+                return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
+                    .ToBusinessPaging<IList<Customer>>();
+            }
+
+            return result;
         }
 
         public async Task<IBusinessResult<Customer>> GetById(int id, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                // create criteria to load navigation (contact)
-                var paging = new PagingCriteriaExpression<Customer>(3, 0);
-                paging.NavigationExpr.Add(x => x.Contacts);
+            // create criteria to load navigation (contact)
+            var paging = new PagingCriteriaExpression<Customer>(3, 0);
+            paging.NavigationExpr.Add(x => x.Contacts);
 
-                // try to retrieve identifier with navigation property
-                return await GetByIdAsync(id, paging, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                Logging.Error(ex);
-                throw ex;
-            }
+            // try to retrieve identifier with navigation property
+            return await GetByIdAsync(id, paging, cancellationToken);
         }
 
         #endregion
@@ -102,14 +99,12 @@ namespace CustomerAPI.Application.Logic
             entityModel.Created = DateTime.Now;
 
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (entityModel.Validate())
+            if (entityModel.Validate(NotificationContext, Validator)
+                && await AddAsync(entityModel, cancellationToken: cancellationToken) > 0)
             {
-                if (await AddAsync(entityModel, cancellationToken: cancellationToken) > 0)
-                {
-                    return entityModel.Id.ToBusiness(
-                        Messages.OPERATION_SUCCESS
-                            .ToMessageResult("CustomerCreate", MessageType.Success));
-                }
+                return entityModel.Id.ToBusiness(
+                    Messages.OPERATION_SUCCESS
+                        .ToMessageResult("CustomerCreate", MessageType.Success));
             }
 
             // get message in request context, if not, use default message
@@ -136,10 +131,10 @@ namespace CustomerAPI.Application.Logic
             entityModel.Created = entityDb.Created;
 
             // entity filling with received entity properties as input
-            AutoMapperHelper.Map<Customer>(entityDb, entityModel);
+            entityModel.CopyPropertiesTo(entityDb);
 
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (entityDb.Validate())
+            if (entityDb.Validate(NotificationContext, Validator))
             {
                 // apply changes to database
                 int affectedRows = await ModifyAsync(entityDb, cancellationToken: cancellationToken);

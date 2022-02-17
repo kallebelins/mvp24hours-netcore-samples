@@ -1,6 +1,8 @@
 using CustomerAPI.Infrastructure.Data;
 using CustomerAPI.WebAPI.Extensions;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,13 +41,14 @@ namespace CustomerAPI.WebAPI
             services.AddMvp24HoursWebEssential(Configuration);
             services.AddMvp24HoursMapService(assemblyMap: Assembly.GetExecutingAssembly());
             services.AddMvp24HoursWebJson();
-            services.AddMvp24HoursWebSwagger("Customer EF API", xmlCommentsFileName: "CustomerAPI.WebAPI.xml", enableExample: true);
+            services.AddMvp24HoursWebSwagger("Customer Pipeline EF API", xmlCommentsFileName: "CustomerAPI.WebAPI.xml", enableExample: true);
             services.AddMvp24HoursWebGzip();
             services.AddMvp24HoursPipelineAsync();
             #endregion
 
             services.AddMyServices();
             services.AddMyDbContext(Configuration);
+            services.AddMyHealthChecks(Configuration);
 
             services.AddControllers();
             services.AddMvc();
@@ -70,11 +73,16 @@ namespace CustomerAPI.WebAPI
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/hc", new HealthCheckOptions
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
             });
 
             if (!env.IsProduction())
             {
-                app.UseMvp24HoursSwagger("Customer EF API");
+                app.UseMvp24HoursSwagger("Customer Pipeline EF API");
             }
 
             app.UseMvp24Hours();

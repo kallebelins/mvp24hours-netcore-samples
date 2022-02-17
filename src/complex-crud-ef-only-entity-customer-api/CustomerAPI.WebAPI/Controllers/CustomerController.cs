@@ -4,7 +4,6 @@ using CustomerAPI.Core.ValueObjects.Customers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
-using Mvp24Hours.Core.DTOs;
 using Mvp24Hours.Core.DTOs.Models;
 using Mvp24Hours.Extensions;
 using Mvp24Hours.WebAPI.Controller;
@@ -32,7 +31,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<Customer>>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<Customer>>>), StatusCodes.Status404NotFound)]
         [Route("", Name = "CustomerGetBy")]
-        public async Task<ActionResult<IPagingResult<IList<Customer>>>> GetBy([FromQuery] CustomerFilterModel model, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
+        public async Task<ActionResult<IPagingResult<IList<Customer>>>> GetBy([FromQuery] CustomerQuery model, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
         {
             var result = await FacadeService.CustomerService.GetBy(model, pagingCriteria.ToPagingCriteria(), cancellationToken: cancellationToken);
             if (result.HasData())

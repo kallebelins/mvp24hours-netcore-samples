@@ -34,7 +34,7 @@
             
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.GetBy(CustomerAPI.Core.ValueObjects.Customers.CustomerFilterModel,Mvp24Hours.Core.DTOs.Models.PagingCriteriaRequest,System.Threading.CancellationToken)">
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.GetBy(CustomerAPI.Core.ValueObjects.Customers.CustomerQuery,Mvp24Hours.Core.DTOs.Models.PagingCriteriaRequest,System.Threading.CancellationToken)">
             <summary>
             Get paginated list of customers
             </summary>
@@ -65,6 +65,11 @@
             </summary>
         </member>
         <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyDbContext(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyHealthChecks(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             
             </summary>

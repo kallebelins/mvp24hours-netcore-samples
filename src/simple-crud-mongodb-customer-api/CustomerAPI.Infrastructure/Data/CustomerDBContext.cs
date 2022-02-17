@@ -1,5 +1,7 @@
-﻿using Mvp24Hours.Extensions;
+﻿using Microsoft.Extensions.Options;
+using Mvp24Hours.Extensions;
 using Mvp24Hours.Infrastructure.Data.MongoDb;
+using Mvp24Hours.Infrastructure.Data.MongoDb.Configuration;
 using System.Reflection;
 
 namespace CustomerAPI.Infrastructure.Data
@@ -8,8 +10,8 @@ namespace CustomerAPI.Infrastructure.Data
     {
         #region [ Ctor ]
 
-        public CustomerDBContext(string databaseName, string connectionString)
-            : base(databaseName, connectionString)
+        public CustomerDBContext(IOptions<MongoDbOptions> options)
+            : base(options)
         {
             this.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }

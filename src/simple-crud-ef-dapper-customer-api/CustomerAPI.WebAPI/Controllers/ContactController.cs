@@ -1,9 +1,12 @@
 ﻿using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Resources;
 using Dapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.Data;
+using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
+using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
 using Mvp24Hours.Extensions;
@@ -26,8 +29,12 @@ namespace CustomerAPI.WebAPI.Controllers
         #region [ Fields / Properties ]
 
         private readonly IUnitOfWorkAsync unitOfWork;
+        private readonly IValidator<Contact> validator;
 
-        private IRepositoryAsync<Contact> repository
+        /// <summary>
+        /// 
+        /// </summary>
+        protected IRepositoryAsync<Contact> Repository
         {
             get
             {
@@ -42,9 +49,11 @@ namespace CustomerAPI.WebAPI.Controllers
         /// <summary>
         /// 
         /// </summary>
-        public ContactController(IUnitOfWorkAsync uoW)
+        public ContactController(IUnitOfWorkAsync uoW, ILoggingService logging, INotificationContext notification, IValidator<Contact> validator)
+            : base(logging, notification)
         {
-            unitOfWork = uoW;
+            this.unitOfWork = uoW;
+            this.validator = validator;
         }
 
         #endregion
@@ -63,7 +72,7 @@ namespace CustomerAPI.WebAPI.Controllers
             // load all customer contacts by id
             var result = await unitOfWork
                 .GetConnection()
-                .QueryAsync<Contact>("select * from contact where customerId = @customerId", new { customerId });
+                .QueryAsync<Contact>("select * from Contact where CustomerId = @customerId", new { customerId });
 
             // checks if there are any records in the database from the filter
             if (!result.AnyOrNotNull())
@@ -87,10 +96,10 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<IList<Contact>>>> Create(int customerId, [FromBody] Contact model, CancellationToken cancellationToken)
         {
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (model.Validate())
+            if (model.Validate(NotificationContext, validator))
             {
                 model.CustomerId = customerId;
-                await repository.AddAsync(model, cancellationToken);
+                await Repository.AddAsync(model, cancellationToken);
                 if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
                 {
                     return Created(nameof(Create), model.ToBusiness());
@@ -116,10 +125,10 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<IList<Contact>>>> Update(int customerId, int id, [FromBody] Contact model, CancellationToken cancellationToken)
         {
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (model.Validate())
+            if (model.Validate(NotificationContext, validator))
             {
                 // get entity through contact and customer identifier
-                var modelDb = await repository.GetByAsync(x => x.Id == id && x.CustomerId == customerId, cancellationToken)
+                var modelDb = await Repository.GetByAsync(x => x.Id == id && x.CustomerId == customerId, cancellationToken)
                     .FirstOrDefaultAsync();
                 if (modelDb == null)
                 {
@@ -134,7 +143,7 @@ namespace CustomerAPI.WebAPI.Controllers
                 model.Created = modelDb.Created;
 
                 // apply changes to database
-                await repository.ModifyAsync(model, cancellationToken);
+                await Repository.ModifyAsync(model, cancellationToken);
                 if (await unitOfWork.SaveChangesAsync(cancellationToken) == 0)
                 {
                     return StatusCode((int)HttpStatusCode.NotModified);
@@ -163,7 +172,7 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<IList<Contact>>>> Delete(int customerId, int id, CancellationToken cancellationToken)
         {
             // try to retrieve entity by identifier
-            var model = await repository.GetByAsync(x => x.Id == id && x.CustomerId == customerId, cancellationToken)
+            var model = await Repository.GetByAsync(x => x.Id == id && x.CustomerId == customerId, cancellationToken)
                 .FirstOrDefaultAsync();
             if (model == null)
             {
@@ -173,7 +182,7 @@ namespace CustomerAPI.WebAPI.Controllers
             }
 
             // perform delete action
-            await repository.RemoveAsync(model, cancellationToken);
+            await Repository.RemoveAsync(model, cancellationToken);
             if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
             {
                 return Ok(Messages.OPERATION_SUCCESS

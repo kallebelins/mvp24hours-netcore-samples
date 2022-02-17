@@ -14,6 +14,7 @@ The pipeline pattern is used to perform service integration, since we have contr
 - Using ActionResult for API resources (Restful);
 - Middlewares for handling unmanaged failures;
 - DDD concepts;
+- Health Checks;
 
 ## Layers:
 

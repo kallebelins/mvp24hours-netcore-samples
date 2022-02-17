@@ -11,8 +11,8 @@ namespace CustomerAPI.Core.Contract.Logic
     /// </summary>
     public interface ICustomerService
     {
-        Task<IPagingResult<IList<GetByCustomerResponse>>> GetBy(GetByCustomerRequest filter, IPagingCriteria criteria, CancellationToken cancellationToken = default);
-        Task<IBusinessResult<GetByIdCustomerResponse>> GetById(int id, CancellationToken cancellationToken = default);
+        Task<IPagingResult<IList<CustomerResult>>> GetBy(CustomerQuery filter, IPagingCriteria criteria, CancellationToken cancellationToken = default);
+        Task<IBusinessResult<CustomerIdResult>> GetById(int id, CancellationToken cancellationToken = default);
         Task<IBusinessResult<int>> RunDataSeed(CancellationToken cancellationToken = default);
     }
 }

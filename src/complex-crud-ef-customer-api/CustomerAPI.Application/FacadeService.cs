@@ -6,7 +6,7 @@ namespace CustomerAPI.Application
     /// <summary>
     /// Provides all services available for use in this project
     /// </summary>
-    public class FacadeService
+    public static class FacadeService
     {
         #region [ Services ]
         /// <summary>

@@ -27,7 +27,7 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
             this.unitOfWorkAsync = ServiceProviderHelper.GetService<IUnitOfWorkAsync>();
         }
 
-        public override async Task<IPipelineMessage> ExecuteAsync(IPipelineMessage input)
+        public override async Task ExecuteAsync(IPipelineMessage input)
         {
             var repo = unitOfWorkAsync.GetRepository<Customer>();
 
@@ -36,8 +36,6 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
                 NotificationContext.Add("ValidateCustomerRepositoryStep", Messages.RECORD_NOT_SEED_DATA, Mvp24Hours.Core.Enums.MessageType.Error);
                 input.SetLock();
             }
-
-            return input;
         }
     }
 }

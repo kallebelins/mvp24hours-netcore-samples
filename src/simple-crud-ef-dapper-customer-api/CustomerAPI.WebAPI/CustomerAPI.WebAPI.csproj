@@ -10,10 +10,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="3.2.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="3.1.2" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-		<PackageReference Include="Mvp24Hours.WebAPI" Version="3.1.242" />
-		<PackageReference Include="MySql.EntityFrameworkCore" Version="5.0.8" />
+		<PackageReference Include="Mvp24Hours.WebAPI" Version="3.2.171" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -11,9 +11,9 @@ namespace CustomerAPI.Core.Contract.Logic
     /// </summary>
     public interface IContactService
     {
-        Task<IBusinessResult<IList<GetByIdContactResponse>>> GetBy(int customerId, CancellationToken cancellationToken = default);
-        Task<IBusinessResult<int>> Create(int customerId, CreateContactRequest dto, CancellationToken cancellationToken = default);
-        Task<IBusinessResult<int>> Update(int customerId, int id, UpdateContactRequest dto, CancellationToken cancellationToken = default);
+        Task<IBusinessResult<IList<ContactIdResult>>> GetBy(int customerId, CancellationToken cancellationToken = default);
+        Task<IBusinessResult<int>> Create(int customerId, ContactCreate dto, CancellationToken cancellationToken = default);
+        Task<IBusinessResult<int>> Update(int customerId, int id, ContactUpdate dto, CancellationToken cancellationToken = default);
         Task<IBusinessResult<int>> Delete(int customerId, int id, CancellationToken cancellationToken = default);
     }
 }

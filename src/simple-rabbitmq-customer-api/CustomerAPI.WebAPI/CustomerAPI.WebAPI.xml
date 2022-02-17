@@ -9,12 +9,12 @@
             
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.#ctor(Mvp24Hours.Infrastructure.RabbitMQ.Core.Contract.IMvpRabbitMQProducer{CustomerAPI.Core.ValueObjects.Customers.CreateCustomerRequest},Mvp24Hours.Infrastructure.RabbitMQ.Core.Contract.IMvpRabbitMQProducer{CustomerAPI.Core.ValueObjects.Customers.UpdateCustomerRequest},Mvp24Hours.Infrastructure.RabbitMQ.Core.Contract.IMvpRabbitMQProducer{CustomerAPI.Core.ValueObjects.Customers.DeleteCustomerRequest})">
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.#ctor(Mvp24Hours.Infrastructure.RabbitMQ.MvpRabbitMQProducer{CustomerAPI.Core.ValueObjects.Customers.CustomerCreate},Mvp24Hours.Infrastructure.RabbitMQ.MvpRabbitMQProducer{CustomerAPI.Core.ValueObjects.Customers.CustomerUpdate},Mvp24Hours.Infrastructure.RabbitMQ.MvpRabbitMQProducer{CustomerAPI.Core.ValueObjects.Customers.CustomerDelete})">
             <summary>
             
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.GetBy(CustomerAPI.Core.ValueObjects.Customers.GetByCustomerRequest,Mvp24Hours.Core.DTOs.Models.PagingCriteriaRequest,System.Threading.CancellationToken)">
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.GetBy(CustomerAPI.Core.ValueObjects.Customers.CustomerQuery,Mvp24Hours.Core.DTOs.Models.PagingCriteriaRequest,System.Threading.CancellationToken)">
             <summary>
             Get paginated list of customers
             </summary>
@@ -24,12 +24,12 @@
             Get customer with contact list
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.Create(CustomerAPI.Core.ValueObjects.Customers.CreateCustomerRequest)">
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.Create(CustomerAPI.Core.ValueObjects.Customers.CustomerCreate)">
             <summary>
             Create customer
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.Update(System.Int32,CustomerAPI.Core.ValueObjects.Customers.UpdateCustomerRequest)">
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.Update(System.Int32,CustomerAPI.Core.ValueObjects.Customers.CustomerUpdate)">
             <summary>
             Update customer data
             </summary>
@@ -45,6 +45,11 @@
             </summary>
         </member>
         <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyDbContext(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyHealthChecks(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             
             </summary>

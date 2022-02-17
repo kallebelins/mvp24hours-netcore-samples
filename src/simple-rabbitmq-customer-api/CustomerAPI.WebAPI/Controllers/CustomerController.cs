@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.DTOs.Models;
 using Mvp24Hours.Extensions;
+using Mvp24Hours.Infrastructure.RabbitMQ;
 using Mvp24Hours.Infrastructure.RabbitMQ.Core.Contract;
 using Mvp24Hours.WebAPI.Controller;
 using System.Collections.Generic;
@@ -23,9 +24,9 @@ namespace CustomerAPI.WebAPI.Controllers
     {
         #region [ Properties / Fields ]
 
-        private readonly IMvpRabbitMQProducer<CreateCustomerRequest> createProducer;
-        private readonly IMvpRabbitMQProducer<UpdateCustomerRequest> updateProducer;
-        private readonly IMvpRabbitMQProducer<DeleteCustomerRequest> deteleProducer;
+        private readonly MvpRabbitMQProducer<CustomerCreate> createProducer;
+        private readonly MvpRabbitMQProducer<CustomerUpdate> updateProducer;
+        private readonly MvpRabbitMQProducer<CustomerDelete> deteleProducer;
 
         #endregion
 
@@ -35,9 +36,9 @@ namespace CustomerAPI.WebAPI.Controllers
         /// 
         /// </summary>
         public CustomerController(
-            IMvpRabbitMQProducer<CreateCustomerRequest> createProducer,
-            IMvpRabbitMQProducer<UpdateCustomerRequest> updateProducer,
-            IMvpRabbitMQProducer<DeleteCustomerRequest> deteleProducer)
+            MvpRabbitMQProducer<CustomerCreate> createProducer,
+            MvpRabbitMQProducer<CustomerUpdate> updateProducer,
+            MvpRabbitMQProducer<CustomerDelete> deteleProducer)
         {
             this.createProducer = createProducer;
             this.updateProducer = updateProducer;
@@ -52,10 +53,10 @@ namespace CustomerAPI.WebAPI.Controllers
         /// Get paginated list of customers
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<GetByCustomerResponse>>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<GetByCustomerResponse>>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<CustomerResult>>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<CustomerResult>>>), StatusCodes.Status404NotFound)]
         [Route("", Name = "CustomerGetBy")]
-        public async Task<ActionResult<IPagingResult<IList<GetByCustomerResponse>>>> GetBy([FromQuery] GetByCustomerRequest filter, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
+        public async Task<ActionResult<IPagingResult<IList<CustomerResult>>>> GetBy([FromQuery] CustomerQuery filter, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
         {
             var result = await FacadeService.CustomerService.GetBy(filter, pagingCriteria.ToPagingCriteria(), cancellationToken: cancellationToken);
             if (result.HasData())
@@ -69,10 +70,10 @@ namespace CustomerAPI.WebAPI.Controllers
         /// Get customer with contact list
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<GetByIdCustomerResponse>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<GetByIdCustomerResponse>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<CustomerIdResult>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<CustomerIdResult>>), StatusCodes.Status404NotFound)]
         [Route("{id}", Name = "CustomerGetById")]
-        public async Task<ActionResult<IBusinessResult<GetByIdCustomerResponse>>> GetById(int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<IBusinessResult<CustomerIdResult>>> GetById(int id, CancellationToken cancellationToken)
         {
             var result = await FacadeService.CustomerService.GetById(id, cancellationToken: cancellationToken);
             if (result.HasData())
@@ -88,7 +89,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ActionResult<string>), StatusCodes.Status201Created)]
         [Route("", Name = "CustomerCreate")]
-        public ActionResult Create([FromBody] CreateCustomerRequest model)
+        public ActionResult Create([FromBody] CustomerCreate model)
         {
             createProducer.Publish(model);
             return Created(nameof(Create), model.Token);
@@ -100,7 +101,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [HttpPut]
         [ProducesResponseType(typeof(ActionResult<string>), StatusCodes.Status201Created)]
         [Route("{id}", Name = "CustomerUpdate")]
-        public ActionResult Update(int id, [FromBody] UpdateCustomerRequest model)
+        public ActionResult Update(int id, [FromBody] CustomerUpdate model)
         {
             model.Id = id;
             updateProducer.Publish(model);
@@ -115,7 +116,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{id}", Name = "CustomerDelete")]
         public ActionResult Delete(int id)
         {
-            var model = new DeleteCustomerRequest() { Id = id };
+            var model = new CustomerDelete() { Id = id };
             deteleProducer.Publish(model);
             return Created(nameof(Create), model.Token);
         }

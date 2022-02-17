@@ -8,21 +8,21 @@ using System.Threading.Tasks;
 
 namespace CustomerAPI.Typicode.Application.Pipe.Operations.Customers
 {
-    public class GetByCustomerMapperResponseStep : OperationMapperAsync<IList<GetByCustomerResponse>>
+    public class GetByCustomerMapperResponseStep : OperationMapperAsync<IList<CustomerResult>>
     {
-        public override async Task<IList<GetByCustomerResponse>> MapperAsync(IPipelineMessage input)
+        public override async Task<IList<CustomerResult>> MapperAsync(IPipelineMessage input)
         {
             if (!input.HasContent("customers"))
             {
                 NotificationContext.Add("GetByCustomerMapperResponseStep", Messages.RECORD_NOT_FOUND, Mvp24Hours.Core.Enums.MessageType.Error);
                 input.SetLock();
-                return await Task.FromResult<IList<GetByCustomerResponse>>(default);
+                return await Task.FromResult<IList<CustomerResult>>(default);
             }
 
             var customers = input.GetContent<dynamic>("customers");
-            var filter = input.GetContent<GetByCustomerFilterRequest>();
+            var filter = input.GetContent<CustomerQuery>();
 
-            IList<GetByCustomerResponse> result = new List<GetByCustomerResponse>();
+            IList<CustomerResult> result = new List<CustomerResult>();
 
             foreach (var customer in customers)
             {
@@ -44,7 +44,7 @@ namespace CustomerAPI.Typicode.Application.Pipe.Operations.Customers
                     }
                 }
 
-                result.Add(new GetByCustomerResponse
+                result.Add(new CustomerResult
                 {
                     Id = customer.id,
                     Name = customer.name

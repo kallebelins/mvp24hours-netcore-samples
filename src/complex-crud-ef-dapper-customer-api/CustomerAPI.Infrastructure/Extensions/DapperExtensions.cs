@@ -32,7 +32,7 @@ namespace CustomerAPI.Infrastructure.Extensions
         public static async Task<IPagingResult<IEnumerable<T>>> QueryPagingResultAsync<T>(this IDbConnection connection, IPagingCriteria pagingCriteria = null, string whereSql = null, dynamic whereParams = null, string orderBySql = "id asc")
             where T : class
         {
-            int limit = ConfigurationPropertiesHelper.MaxQtyByQueryPage;
+            int limit = (int)ConfigurationHelper.AppSettings["Settings:MaxQtyByQueryPage"].ToInt(300);
             int offset = 0;
 
             // set pagination pattern
@@ -57,7 +57,15 @@ namespace CustomerAPI.Infrastructure.Extensions
 
             // get list with pagination
             var sqlQueryBuilder = new SqlBuilder();
-            var sqlQuery = sqlQueryBuilder.AddTemplate($"select * from {typeof(T).Name} /**where**/ /**orderby**/ limit @limit offset @offset");
+
+#pragma warning disable S125 // Sections of code should not be commented out
+            /* MySql / PostgreSql */
+            // var sqlQuery = sqlQueryBuilder.AddTemplate($"select * from {typeof(T).Name} /**where**/ /**orderby**/ limit @limit offset @offset");
+
+            /* SqlServer */
+            var sqlQuery = sqlQueryBuilder.AddTemplate($"select * from {typeof(T).Name} /**where**/ /**orderby**/ offset @offset rows fetch next @limit rows only");
+#pragma warning restore S125 // Sections of code should not be commented out
+
             sqlQueryBuilder.AddParameters(new { limit, offset });
 
             // add filter

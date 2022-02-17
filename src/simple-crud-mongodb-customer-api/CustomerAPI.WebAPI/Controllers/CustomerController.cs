@@ -1,9 +1,12 @@
 ﻿using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Resources;
 using CustomerAPI.WebAPI.Models;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.Data;
+using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
+using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.DTOs.Models;
 using Mvp24Hours.Core.Enums;
@@ -30,27 +33,25 @@ namespace CustomerAPI.WebAPI.Controllers
         #region [ Fields / Properties ]
 
         private readonly IUnitOfWorkAsync unitOfWork;
-
-        private IRepositoryAsync<Customer> repository
-        {
-            get
-            {
-                return unitOfWork.GetRepository<Customer>();
-            }
-        }
-
-        #endregion
-
-        #region [ Ctors ]
+        private readonly IValidator<Customer> validator;
 
         /// <summary>
         /// 
         /// </summary>
-        public CustomerController(IUnitOfWorkAsync uoW)
-        {
-            unitOfWork = uoW;
-        }
+        protected IRepositoryAsync<Customer> Repository => unitOfWork.GetRepository<Customer>();
 
+        #endregion
+
+        #region [ Ctors ]
+        /// <summary>
+        /// 
+        /// </summary>
+        public CustomerController(IUnitOfWorkAsync uoW, ILoggingService logging, INotificationContext notification, IValidator<Customer> validator)
+            : base(logging, notification)
+        {
+            this.unitOfWork = uoW;
+            this.validator = validator;
+        }
         #endregion
 
         #region [ Actions / Resources ]
@@ -62,7 +63,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<Customer>>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<IList<Customer>>>), StatusCodes.Status404NotFound)]
         [Route("", Name = "CustomerGetBy")]
-        public async Task<ActionResult<IPagingResult<IList<Customer>>>> GetBy([FromQuery] CustomerFilter model, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
+        public async Task<ActionResult<IPagingResult<IList<Customer>>>> GetBy([FromQuery] CustomerQuery model, [FromQuery] PagingCriteriaRequest pagingCriteria)
         {
             // construct expression to apply filter on database
             Expression<Func<Customer, bool>> clause = x => true;
@@ -76,8 +77,11 @@ namespace CustomerAPI.WebAPI.Controllers
                 clause = clause.And(x => x.Active == model.Active);
             }
 
+            // apply filter with pagination
+            var result = await Repository.ToBusinessPagingAsync(clause, pagingCriteria.ToPagingCriteria());
+
             // checks if there are any records in the database from the filter
-            if (!await repository.GetByAnyAsync(clause, cancellationToken))
+            if (!result.HasData())
             {
                 // reply with standard message for record not found
                 return NotFound(Messages.RECORD_NOT_FOUND
@@ -85,8 +89,6 @@ namespace CustomerAPI.WebAPI.Controllers
                         .ToBusiness<IList<Customer>>());
             }
 
-            // apply filter with pagination
-            var result = await repository.ToBusinessPagingAsync(clause, pagingCriteria.ToPagingCriteria());
             return Ok(result);
         }
 
@@ -100,7 +102,7 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<Customer>>> GetById(string id, CancellationToken cancellationToken)
         {
             // try to retrieve identifier with navigation property
-            var model = await repository.GetByIdAsync(id, cancellationToken);
+            var model = await Repository.GetByIdAsync(id, cancellationToken);
             if (model == null)
             {
                 // reply with standard message for record not found
@@ -121,10 +123,10 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<Customer>>> Create([FromBody] Customer model, CancellationToken cancellationToken)
         {
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (model.Validate())
+            if (model.Validate(NotificationContext, validator))
             {
                 model.Created = TimeZoneHelper.GetTimeZoneNow();
-                await repository.AddAsync(model, cancellationToken);
+                await Repository.AddAsync(model, cancellationToken);
                 if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
                 {
                     return Created(nameof(Create), model.ToBusiness());
@@ -150,10 +152,10 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<Customer>>> Update(string id, [FromBody] Customer model, CancellationToken cancellationToken)
         {
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (model.Validate())
+            if (model.Validate(NotificationContext, validator))
             {
                 // gets entity through the identifier informed in the resource
-                var modelDb = await repository.GetByIdAsync(id, cancellationToken);
+                var modelDb = await Repository.GetByIdAsync(id, cancellationToken);
                 if (modelDb == null)
                 {
                     return NotFound(Messages.RECORD_NOT_FOUND_FOR_ID
@@ -166,7 +168,7 @@ namespace CustomerAPI.WebAPI.Controllers
                 model.Created = modelDb.Created;
 
                 // apply changes to database
-                await repository.ModifyAsync(model, cancellationToken);
+                await Repository.ModifyAsync(model, cancellationToken);
                 if (await unitOfWork.SaveChangesAsync(cancellationToken) == 0)
                 {
                     return StatusCode((int)HttpStatusCode.NotModified);
@@ -195,7 +197,7 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<Customer>>> Delete(string id, CancellationToken cancellationToken)
         {
             // try to retrieve entity by identifier
-            var model = await repository.GetByIdAsync(id, cancellationToken);
+            var model = await Repository.GetByIdAsync(id, cancellationToken);
             if (model == null)
             {
                 return NotFound(Messages.RECORD_NOT_FOUND_FOR_ID
@@ -204,7 +206,7 @@ namespace CustomerAPI.WebAPI.Controllers
             }
 
             // perform delete action
-            await repository.RemoveAsync(model, cancellationToken);
+            await Repository.RemoveAsync(model, cancellationToken);
             if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
             {
                 return Ok(Messages.OPERATION_SUCCESS

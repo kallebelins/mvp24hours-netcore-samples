@@ -34,7 +34,7 @@ namespace CustomerAPI.Application.Logic
 
         #region [ Actions ]
 
-        public async Task<IBusinessResult<IList<GetByCustomerResponse>>> GetBy(GetByCustomerFilterRequest filter)
+        public async Task<IBusinessResult<IList<CustomerResult>>> GetBy(CustomerQuery filter)
         {
             // note: IGetByCustomerBuilder can be injected through class constructor as class member
 
@@ -46,8 +46,8 @@ namespace CustomerAPI.Application.Logic
             await pipeline.ExecuteAsync(filter.ToMessage());
 
             // try to get response content
-            IList<GetByCustomerResponse> result = pipeline.GetMessage()
-                .GetContent<List<GetByCustomerResponse>>();
+            IList<CustomerResult> result = pipeline.GetMessage()
+                .GetContent<List<CustomerResult>>();
 
             // checks if there are any records
             if (!result.AnyOrNotNull())
@@ -55,13 +55,13 @@ namespace CustomerAPI.Application.Logic
                 // reply with standard message for record not found
                 return Messages.RECORD_NOT_FOUND
                     .ToMessageResult(MessageType.Error)
-                        .ToBusiness<IList<GetByCustomerResponse>>();
+                        .ToBusiness<IList<CustomerResult>>();
             }
 
             return result.ToBusiness();
         }
 
-        public async Task<IBusinessResult<GetByIdCustomerResponse>> GetById(int id)
+        public async Task<IBusinessResult<CustomerIdResult>> GetById(int id)
         {
             // note: IGetByIdCustomerBuilder can be injected through class constructor as class member
 
@@ -74,7 +74,7 @@ namespace CustomerAPI.Application.Logic
 
             // try to get response content
             var result = pipeline.GetMessage()
-                .GetContent<GetByIdCustomerResponse>();
+                .GetContent<CustomerIdResult>();
 
             // checks if there are any records
             if (result == null)
@@ -82,7 +82,7 @@ namespace CustomerAPI.Application.Logic
                 // reply with standard message for record not found
                 return Messages.RECORD_NOT_FOUND_FOR_ID
                     .ToMessageResult(MessageType.Error)
-                        .ToBusiness<GetByIdCustomerResponse>();
+                        .ToBusiness<CustomerIdResult>();
             }
             return result.ToBusiness();
         }

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mvp24Hours.Extensions;
 using Mvp24Hours.Helpers;
+using Mvp24Hours.Infrastructure.RabbitMQ;
 using Mvp24Hours.Infrastructure.RabbitMQ.Core.Contract;
 
 namespace CustomerAPI.WebAPI.Extensions
@@ -27,8 +28,32 @@ namespace CustomerAPI.WebAPI.Extensions
         public static IServiceCollection AddMyDbContext(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<CustomerDBContext>(options =>
-                options.UseMySQL(configuration.GetConnectionString("CustomerDbContext")));
-            services.AddMvp24HoursDbServiceAsync<CustomerDBContext>();
+                options.UseSqlServer(configuration.GetConnectionString("CustomerDbContext"))
+            );
+            services.AddMvp24HoursDbContext<CustomerDBContext>();
+            services.AddMvp24HoursRepositoryAsync(options =>
+            {
+                options.MaxQtyByQueryPage = 100;
+                options.TransactionIsolationLevel = System.Transactions.IsolationLevel.ReadCommitted;
+            });
+            return services;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IServiceCollection AddMyHealthChecks(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHealthChecks()
+                .AddSqlServer(
+                    configuration.GetConnectionString("CustomerDbContext"),
+                    healthQuery: "SELECT 1;",
+                    name: "SqlServer",
+                    failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded)
+                .AddRabbitMQ(
+                    configuration.GetConnectionString("RabbitMQContext"),
+                    name: "RabbitMQ",
+                    failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded);
             return services;
         }
 
@@ -47,9 +72,9 @@ namespace CustomerAPI.WebAPI.Extensions
         /// </summary>
         public static IServiceCollection AddMyRabbitProducer(this IServiceCollection services)
         {
-            services.AddScoped<IMvpRabbitMQProducer<CreateCustomerRequest>, CreateCustomerProducer>();
-            services.AddScoped<IMvpRabbitMQProducer<UpdateCustomerRequest>, UpdateCustomerProducer>();
-            services.AddScoped<IMvpRabbitMQProducer<DeleteCustomerRequest>, DeleteCustomerProducer>();
+            services.AddScoped<MvpRabbitMQProducer<CustomerCreate>, CreateCustomerProducer>();
+            services.AddScoped<MvpRabbitMQProducer<CustomerUpdate>, UpdateCustomerProducer>();
+            services.AddScoped<MvpRabbitMQProducer<CustomerDelete>, DeleteCustomerProducer>();
             return services;
         }
 
@@ -58,9 +83,9 @@ namespace CustomerAPI.WebAPI.Extensions
         /// </summary>
         public static IServiceCollection AddMyRabbitConsumer(this IServiceCollection services)
         {
-            services.AddScoped<IMvpRabbitMQConsumerAsync<CreateCustomerRequest>, CreateCustomerConsumerAsync>();
-            services.AddScoped<IMvpRabbitMQConsumerAsync<UpdateCustomerRequest>, UpdateCustomerConsumerAsync>();
-            services.AddScoped<IMvpRabbitMQConsumerAsync<DeleteCustomerRequest>, DeleteCustomerConsumerAsync>();
+            services.AddScoped<MvpRabbitMQConsumerAsync<CustomerCreate>, CreateCustomerConsumer>();
+            services.AddScoped<MvpRabbitMQConsumerAsync<CustomerUpdate>, UpdateCustomerConsumer>();
+            services.AddScoped<MvpRabbitMQConsumerAsync<CustomerDelete>, DeleteCustomerConsumer>();
             return services;
         }
 
@@ -69,16 +94,22 @@ namespace CustomerAPI.WebAPI.Extensions
         /// </summary>
         public static IServiceCollection AddMyHostedService(this IServiceCollection services)
         {
-            services.AddMvp24HoursHostedService((e) =>
+            services.AddMvp24HoursHostedService(options =>
             {
-                var createConsumer = ServiceProviderHelper.GetService<IMvpRabbitMQConsumerAsync<CreateCustomerRequest>>();
-                createConsumer?.Consume();
+                options.Callback = e =>
+                {
+                    if (ServiceProviderHelper.IsReady())
+                    {
+                        var createConsumer = ServiceProviderHelper.GetService<MvpRabbitMQConsumerAsync<CustomerCreate>>();
+                        createConsumer?.Consume();
 
-                var updateConsumer = ServiceProviderHelper.GetService<IMvpRabbitMQConsumerAsync<UpdateCustomerRequest>>();
-                updateConsumer?.Consume();
+                        var updateConsumer = ServiceProviderHelper.GetService<MvpRabbitMQConsumerAsync<CustomerUpdate>>();
+                        updateConsumer?.Consume();
 
-                var deteleConsumer = ServiceProviderHelper.GetService<IMvpRabbitMQConsumerAsync<DeleteCustomerRequest>>();
-                deteleConsumer?.Consume();
+                        var deteleConsumer = ServiceProviderHelper.GetService<MvpRabbitMQConsumerAsync<CustomerDelete>>();
+                        deteleConsumer?.Consume();
+                    }
+                };
             });
             return services;
         }

@@ -2,11 +2,13 @@
 using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Resources;
 using CustomerAPI.Core.ValueObjects.Customers;
+using FluentValidation;
 using Mvp24Hours.Application.Logic;
 using Mvp24Hours.Core.Contract.Data;
+using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
+using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
-using Mvp24Hours.Core.ValueObjects.Logic;
 using Mvp24Hours.Extensions;
 using Mvp24Hours.Helpers;
 using System;
@@ -19,68 +21,61 @@ namespace CustomerAPI.Application.Logic
 {
     public class CustomerService : RepositoryPagingServiceAsync<Customer, IUnitOfWorkAsync>, ICustomerService
     {
-        #region [ Queries ]
+        #region [ Ctor ]
 
-        public async Task<IPagingResult<IList<GetByCustomerResponse>>> GetBy(GetByCustomerRequest filter, IPagingCriteria criteria, CancellationToken cancellationToken = default)
+        public CustomerService(IUnitOfWorkAsync unitOfWork, ILoggingService logging, INotificationContext notification, IValidator<Customer> validator)
+            : base(unitOfWork, logging, notification, validator)
         {
-            try
-            {
-                // apply filter default
-                Expression<Func<Customer, bool>> clause =
-                    x => (string.IsNullOrEmpty(filter.Name) || x.Name.Contains(filter.Name))
-                        && (filter.Active == null || filter.Active.Value);
-
-                // checks if there are any records in the database from the filter
-                if (!await Repository.GetByAnyAsync(clause, cancellationToken: cancellationToken))
-                {
-                    // reply with standard message for record not found
-                    return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
-                        .ToBusinessPaging<IList<GetByCustomerResponse>>();
-                }
-
-                // apply filter with pagination
-                return await GetByWithPaginationAsync(clause, criteria, cancellationToken: cancellationToken)
-                    .MapPagingToAsync<IList<Customer>, IList<GetByCustomerResponse>>();
-            }
-            catch (Exception ex)
-            {
-                Logging.Error(ex);
-                throw ex;
-            }
         }
 
-        public async Task<IBusinessResult<GetByIdCustomerResponse>> GetById(int id, CancellationToken cancellationToken = default)
+        #endregion
+
+        #region [ Queries ]
+
+        public async Task<IPagingResult<IList<CustomerResult>>> GetBy(CustomerQuery dto, IPagingCriteria criteria, CancellationToken cancellationToken = default)
         {
-            try
+            // apply filter default
+            Expression<Func<Customer, bool>> clause =
+                x => (string.IsNullOrEmpty(dto.Name) || x.Name.Contains(dto.Name))
+                    && (dto.Active == null || dto.Active.Value);
+
+            // try to get paginated data with criteria
+            var result = await GetByWithPaginationAsync(clause, criteria, cancellationToken: cancellationToken);
+
+            // checks if there are any records in the database from the filter
+            if (result?.Summary != null && result.Summary.TotalCount == 0)
             {
-                // try to retrieve identifier with navigation property
-                return await GetByIdAsync(id, cancellationToken)
-                    .MapBusinessToAsync<Customer, GetByIdCustomerResponse>();
+                // reply with standard message for record not found
+                return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
+                    .ToBusinessPaging<IList<CustomerResult>>();
             }
-            catch (Exception ex)
-            {
-                Logging.Error(ex);
-                throw ex;
-            }
+
+            // apply filter with pagination
+            return result.MapPagingTo<IList<Customer>, IList<CustomerResult>>();
+        }
+
+        public async Task<IBusinessResult<CustomerIdResult>> GetById(int id, CancellationToken cancellationToken = default)
+        {
+            // try to retrieve identifier with navigation property
+            return await GetByIdAsync(id, cancellationToken)
+                .MapBusinessToAsync<Customer, CustomerIdResult>();
         }
 
         #endregion
 
         #region [ Commands ]
 
-        public async Task<IBusinessResult<int>> Create(CreateCustomerRequest dto, CancellationToken cancellationToken = default)
+        public async Task<IBusinessResult<int>> Create(CustomerCreate dto, CancellationToken cancellationToken = default)
         {
             var entity = dto.MapTo<Customer>();
 
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (entity.Validate())
+            if (entity.Validate(NotificationContext, Validator)
+                && await AddAsync(entity, cancellationToken: cancellationToken) > 0)
             {
-                if (await AddAsync(entity, cancellationToken: cancellationToken) > 0)
-                {
-                    return entity.Id.ToBusiness(
-                        Messages.OPERATION_SUCCESS
-                            .ToMessageResult("CustomerCreate", MessageType.Success));
-                }
+                return entity.Id.ToBusiness(
+                    Messages.OPERATION_SUCCESS
+                        .ToMessageResult("CustomerCreate", MessageType.Success));
             }
 
             // get message in request context, if not, use default message
@@ -91,7 +86,7 @@ namespace CustomerAPI.Application.Logic
             );
         }
 
-        public async Task<IBusinessResult<int>> Update(int id, UpdateCustomerRequest dto, CancellationToken cancellationToken = default)
+        public async Task<IBusinessResult<int>> Update(int id, CustomerUpdate dto, CancellationToken cancellationToken = default)
         {
             // gets entity through the identifier informed in the resource
             var entity = await Repository.GetByIdAsync(id, cancellationToken: cancellationToken);
@@ -102,11 +97,11 @@ namespace CustomerAPI.Application.Logic
                         .ToBusiness<int>();
             }
 
-            // preenchimento entidade com propriedades do DTO
+            // entity populating with DTO properties
             AutoMapperHelper.Map<Customer>(entity, dto);
 
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (entity.Validate())
+            if (entity.Validate(NotificationContext, Validator))
             {
                 // apply changes to database
                 int affectedRows = await ModifyAsync(entity, cancellationToken: cancellationToken);

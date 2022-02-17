@@ -19,8 +19,27 @@ namespace CustomerAPI.WebAPI.Extensions
         /// </summary>
         public static IServiceCollection AddMyCaching(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddMvp24HoursRedisCache("RedisDbContext", instanceName: "customerapi", configuration: configuration);
+            services.AddMvp24HoursCaching(
+                /* Remove item from cache after duration */
+                AbsoluteExpiration: System.DateTimeOffset.Now.AddMinutes(30),
+                /* Remove item from cache if unsued for the duration */
+                SlidingExpiration: System.TimeSpan.FromMinutes(5)
+            );
+            services.AddMvp24HoursCachingRedis(configuration.GetConnectionString("RedisDbContext"), instanceName: "customerapi");
             services.AddScoped<IRepositoryCacheAsync<CustomerDto>, RepositoryCacheAsync<CustomerDto>>();
+            return services;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IServiceCollection AddMyHealthChecks(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHealthChecks()
+                .AddRedis(
+                    configuration.GetConnectionString("RedisDbContext"),
+                    name: "Redis",
+                    failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded);
             return services;
         }
 

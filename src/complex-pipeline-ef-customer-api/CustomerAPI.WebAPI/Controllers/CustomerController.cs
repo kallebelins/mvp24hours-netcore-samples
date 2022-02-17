@@ -26,10 +26,10 @@ namespace CustomerAPI.WebAPI.Controllers
         /// Get paginated list of customers
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<GetByCustomerResponse>>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<GetByCustomerResponse>>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<CustomerResult>>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<CustomerResult>>>), StatusCodes.Status404NotFound)]
         [Route("", Name = "CustomerGetBy")]
-        public async Task<ActionResult<IPagingResult<IList<GetByCustomerResponse>>>> GetBy([FromQuery] GetByCustomerRequest filter, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
+        public async Task<ActionResult<IPagingResult<IList<CustomerResult>>>> GetBy([FromQuery] CustomerQuery filter, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
         {
             var result = await FacadeService.CustomerService.GetBy(filter, pagingCriteria.ToPagingCriteria(), cancellationToken: cancellationToken);
             if (result.HasData())
@@ -43,10 +43,10 @@ namespace CustomerAPI.WebAPI.Controllers
         /// Get customer with contact list
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<GetByIdCustomerResponse>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<GetByIdCustomerResponse>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<CustomerIdResult>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<CustomerIdResult>>), StatusCodes.Status404NotFound)]
         [Route("{id}", Name = "CustomerGetById")]
-        public async Task<ActionResult<IBusinessResult<GetByIdCustomerResponse>>> GetById(int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<IBusinessResult<CustomerIdResult>>> GetById(int id, CancellationToken cancellationToken)
         {
             var result = await FacadeService.CustomerService.GetById(id, cancellationToken: cancellationToken);
             if (result.HasData())

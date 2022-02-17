@@ -3,9 +3,12 @@ using CustomerAPI.Core.Resources;
 using CustomerAPI.Infrastructure.Extensions;
 using CustomerAPI.WebAPI.Models;
 using Dapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.Data;
+using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
+using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.DTOs.Models;
 using Mvp24Hours.Core.Enums;
@@ -30,8 +33,12 @@ namespace CustomerAPI.WebAPI.Controllers
         #region [ Fields / Properties ]
 
         private readonly IUnitOfWorkAsync unitOfWork;
+        private readonly IValidator<Customer> validator;
 
-        private IRepositoryAsync<Customer> repository
+        /// <summary>
+        /// 
+        /// </summary>
+        protected IRepositoryAsync<Customer> Repository
         {
             get
             {
@@ -46,9 +53,11 @@ namespace CustomerAPI.WebAPI.Controllers
         /// <summary>
         /// 
         /// </summary>
-        public CustomerController(IUnitOfWorkAsync uoW)
+        public CustomerController(IUnitOfWorkAsync uoW, ILoggingService logging, INotificationContext notification, IValidator<Customer> validator)
+            : base(logging, notification)
         {
-            unitOfWork = uoW;
+            this.unitOfWork = uoW;
+            this.validator = validator;
         }
 
         #endregion
@@ -62,7 +71,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(ActionResult<IPagingResult<IEnumerable<Customer>>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<IEnumerable<Customer>>>), StatusCodes.Status404NotFound)]
         [Route("", Name = "CustomerGetBy")]
-        public async Task<ActionResult<IPagingResult<IEnumerable<Customer>>>> GetBy([FromQuery] CustomerFilter model, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
+        public async Task<ActionResult<IPagingResult<IEnumerable<Customer>>>> GetBy([FromQuery] CustomerQuery model, [FromQuery] PagingCriteriaRequest pagingCriteria)
         {
             string whereSql = "(@Active is null or Active = @Active) and (@Name is null or Name like CONCAT('%',@Name,'%'))";
 
@@ -93,8 +102,8 @@ namespace CustomerAPI.WebAPI.Controllers
         {
             // create projection for customer and contact by customer id
             string query = @"
-                select* from customer where id = @id
-                select * from contact where customerId = @id
+                select * from Customer where Id = @id;
+                select * from Contact where CustomerId = @id;
             ";
 
             Customer model = null;
@@ -104,8 +113,9 @@ namespace CustomerAPI.WebAPI.Controllers
                 .GetConnection()
                 .QueryMultipleAsync(query, new { id }))
             {
-                model = await result.ReadFirstAsync<Customer>();
-                model.Contacts = (await result.ReadAsync<Contact>()).ToList();
+                model = await result.ReadFirstOrDefaultAsync<Customer>();
+                if (model != null)
+                    model.Contacts = (await result.ReadAsync<Contact>()).ToList();
             }
 
             if (model == null)
@@ -129,9 +139,9 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<Customer>>> Create([FromBody] Customer model, CancellationToken cancellationToken)
         {
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (model.Validate())
+            if (model.Validate(NotificationContext, validator))
             {
-                await repository.AddAsync(model, cancellationToken);
+                await Repository.AddAsync(model, cancellationToken);
                 if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
                 {
                     return Created(nameof(Create), model.ToBusiness());
@@ -157,10 +167,10 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<Customer>>> Update(int id, [FromBody] Customer model, CancellationToken cancellationToken)
         {
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (model.Validate())
+            if (model.Validate(NotificationContext, validator))
             {
                 // gets entity through the identifier informed in the resource
-                var modelDb = await repository.GetByIdAsync(id, cancellationToken);
+                var modelDb = await Repository.GetByIdAsync(id, cancellationToken);
                 if (modelDb == null)
                 {
                     return NotFound(Messages.RECORD_NOT_FOUND_FOR_ID
@@ -173,7 +183,7 @@ namespace CustomerAPI.WebAPI.Controllers
                 model.Created = modelDb.Created;
 
                 // apply changes to database
-                await repository.ModifyAsync(model, cancellationToken);
+                await Repository.ModifyAsync(model, cancellationToken);
                 if (await unitOfWork.SaveChangesAsync(cancellationToken) == 0)
                 {
                     return StatusCode((int)HttpStatusCode.NotModified);
@@ -202,7 +212,7 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<Customer>>> Delete(int id, CancellationToken cancellationToken)
         {
             // try to retrieve entity by identifier
-            var model = await repository.GetByIdAsync(id, cancellationToken);
+            var model = await Repository.GetByIdAsync(id, cancellationToken);
             if (model == null)
             {
                 return NotFound(Messages.RECORD_NOT_FOUND_FOR_ID
@@ -211,7 +221,7 @@ namespace CustomerAPI.WebAPI.Controllers
             }
 
             // perform delete action
-            await repository.RemoveAsync(model, cancellationToken);
+            await Repository.RemoveAsync(model, cancellationToken);
             if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
             {
                 return Ok(Messages.OPERATION_SUCCESS

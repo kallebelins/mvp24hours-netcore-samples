@@ -12,34 +12,34 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
     /// <summary>
     /// Performs mapping of data obtained through the service
     /// </summary>
-    public class GetByCustomerMapperResponseStep : OperationMapperAsync<IList<CreateCustomerRequest>>
+    public class GetByCustomerMapperResponseStep : OperationMapperAsync<IList<CustomerCreate>>
     {
         public override string ContentKey => "model-customers";
 
-        public override async Task<IList<CreateCustomerRequest>> MapperAsync(IPipelineMessage input)
+        public override async Task<IList<CustomerCreate>> MapperAsync(IPipelineMessage input)
         {
             if (!input.HasContent("customers"))
             {
                 NotificationContext.Add("GetByCustomerMapperResponseStep", Messages.RECORD_NOT_FOUND, Mvp24Hours.Core.Enums.MessageType.Error);
                 input.SetLock();
-                return await Task.FromResult<IList<CreateCustomerRequest>>(default);
+                return await Task.FromResult<IList<CustomerCreate>>(default);
             }
 
             var customers = input.GetContent<dynamic>("customers");
 
-            IList<CreateCustomerRequest> result = new List<CreateCustomerRequest>();
+            IList<CustomerCreate> result = new List<CustomerCreate>();
 
             foreach (var customer in customers)
             {
-                var model = new CreateCustomerRequest
+                var model = new CustomerCreate
                 {
                     Name = customer.name,
-                    Contacts = new List<CreateContactRequest>()
+                    Contacts = new List<ContactCreate>()
                 };
 
                 if (customer.email != null)
                 {
-                    model.Contacts.Add(new CreateContactRequest
+                    model.Contacts.Add(new ContactCreate
                     {
                         Description = customer.email,
                         Type = Core.Enums.ContactType.Email
@@ -48,7 +48,7 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
 
                 if (customer.phone != null)
                 {
-                    model.Contacts.Add(new CreateContactRequest
+                    model.Contacts.Add(new ContactCreate
                     {
                         Description = customer.phone,
                         Type = Core.Enums.ContactType.CellPhone
@@ -57,7 +57,7 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
 
                 if (customer.website != null)
                 {
-                    model.Contacts.Add(new CreateContactRequest
+                    model.Contacts.Add(new ContactCreate
                     {
                         Description = customer.website,
                         Type = Core.Enums.ContactType.Other

@@ -11,10 +11,10 @@ namespace CustomerAPI.Core.Contract.Logic
     /// </summary>
     public interface ICustomerService
     {
-        Task<IPagingResult<IList<GetByCustomerResponse>>> GetBy(GetByCustomerRequest filter, IPagingCriteria criteria, CancellationToken cancellationToken = default);
-        Task<IBusinessResult<GetByIdCustomerResponse>> GetById(string id, CancellationToken cancellationToken = default);
-        Task<IBusinessResult<string>> Create(CreateCustomerRequest dto, CancellationToken cancellationToken = default);
-        Task<IBusinessResult<int>> Update(string id, UpdateCustomerRequest dto, CancellationToken cancellationToken = default);
+        Task<IPagingResult<IList<CustomerResult>>> GetBy(CustomerQuery filter, IPagingCriteria criteria, CancellationToken cancellationToken = default);
+        Task<IBusinessResult<CustomerIdResult>> GetById(string id, CancellationToken cancellationToken = default);
+        Task<IBusinessResult<string>> Create(CustomerCreate dto, CancellationToken cancellationToken = default);
+        Task<IBusinessResult<int>> Update(string id, CustomerUpdate dto, CancellationToken cancellationToken = default);
         Task<IBusinessResult<int>> Delete(string id, CancellationToken cancellationToken = default);
     }
 }

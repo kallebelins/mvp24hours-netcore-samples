@@ -29,10 +29,10 @@ namespace CustomerAPI.WebAPI.Controllers
         /// Get paginated list of customers
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<GetByCustomerResponse>>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<GetByCustomerResponse>>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<CustomerResult>>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ActionResult<IPagingResult<IList<CustomerResult>>>), StatusCodes.Status404NotFound)]
         [Route("", Name = "CustomerGetBy")]
-        public async Task<ActionResult<IPagingResult<IList<GetByCustomerResponse>>>> GetBy([FromQuery] GetByCustomerRequest filter, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
+        public async Task<ActionResult<IPagingResult<IList<CustomerResult>>>> GetBy([FromQuery] CustomerQuery filter, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
         {
             var result = await FacadeService.CustomerService.GetBy(filter, pagingCriteria.ToPagingCriteria(), cancellationToken: cancellationToken);
             if (result.HasData())
@@ -46,10 +46,10 @@ namespace CustomerAPI.WebAPI.Controllers
         /// Get customer with contact list
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<GetByIdCustomerResponse>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<GetByIdCustomerResponse>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<CustomerIdResult>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<CustomerIdResult>>), StatusCodes.Status404NotFound)]
         [Route("{id}", Name = "CustomerGetById")]
-        public async Task<ActionResult<IBusinessResult<GetByIdCustomerResponse>>> GetById(string id, CancellationToken cancellationToken)
+        public async Task<ActionResult<IBusinessResult<CustomerIdResult>>> GetById(string id, CancellationToken cancellationToken)
         {
             var result = await FacadeService.CustomerService.GetById(id, cancellationToken: cancellationToken);
             if (result.HasData())
@@ -66,7 +66,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<string>>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<string>>), StatusCodes.Status400BadRequest)]
         [Route("", Name = "CustomerCreate")]
-        public async Task<ActionResult<IBusinessResult<string>>> Create([FromBody] CreateCustomerRequest model, CancellationToken cancellationToken)
+        public async Task<ActionResult<IBusinessResult<string>>> Create([FromBody] CustomerCreate model, CancellationToken cancellationToken)
         {
             var result = await FacadeService.CustomerService.Create(model, cancellationToken: cancellationToken);
             if (result.HasErrors)
@@ -84,7 +84,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<VoidResult>>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status304NotModified)]
         [Route("{id}", Name = "CustomerUpdate")]
-        public async Task<ActionResult<IBusinessResult<int>>> Update(string id, [FromBody] UpdateCustomerRequest model, CancellationToken cancellationToken)
+        public async Task<ActionResult<IBusinessResult<int>>> Update(string id, [FromBody] CustomerUpdate model, CancellationToken cancellationToken)
         {
             var result = await FacadeService.CustomerService.Update(id, model, cancellationToken: cancellationToken);
             if (result.HasErrors)

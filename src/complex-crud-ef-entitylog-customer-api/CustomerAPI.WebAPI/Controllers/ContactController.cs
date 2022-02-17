@@ -47,7 +47,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<int>>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<int>>), StatusCodes.Status400BadRequest)]
         [Route("{customerId:int}/Contact", Name = "ContactCreate")]
-        public async Task<ActionResult<IBusinessResult<IList<int>>>> Create(int customerId, [FromBody] CreateContactRequest model, CancellationToken cancellationToken)
+        public async Task<ActionResult<IBusinessResult<IList<int>>>> Create(int customerId, [FromBody] ContactCreate model, CancellationToken cancellationToken)
         {
             var result = await FacadeService.ContactService.Create(customerId, model, cancellationToken: cancellationToken);
             if (result.HasErrors)
@@ -66,7 +66,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<int>>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status304NotModified)]
         [Route("{customerId:int}/Contact/{id}", Name = "ContactUpdate")]
-        public async Task<ActionResult<IBusinessResult<IList<int>>>> Update(int customerId, int id, [FromBody] UpdateContactRequest model, CancellationToken cancellationToken)
+        public async Task<ActionResult<IBusinessResult<IList<int>>>> Update(int customerId, int id, [FromBody] ContactUpdate model, CancellationToken cancellationToken)
         {
             var result = await FacadeService.ContactService.Update(customerId, id, model, cancellationToken: cancellationToken);
             if (result.HasErrors)

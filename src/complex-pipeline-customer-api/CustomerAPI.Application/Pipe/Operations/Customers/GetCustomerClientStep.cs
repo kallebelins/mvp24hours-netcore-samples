@@ -8,7 +8,7 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
 {
     public class GetCustomerClientStep : OperationBaseAsync
     {
-        public override async Task<IPipelineMessage> ExecuteAsync(IPipelineMessage input)
+        public override async Task ExecuteAsync(IPipelineMessage input)
         {
             string url = ConfigurationHelper.GetSettings("Settings:TypicodeCustomerUrl");
 
@@ -16,7 +16,7 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
             {
                 NotificationContext.Add("GetCustomerClientStep", "Typicode service url not found in configuration (appsettings).", Mvp24Hours.Core.Enums.MessageType.Error);
                 input.SetLock();
-                return input;
+                return;
             }
 
             string response = await WebRequestHelper.GetAsync(url);
@@ -39,8 +39,6 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
             {
                 input.AddContent("customers", result);
             }
-
-            return input;
         }
     }
 }

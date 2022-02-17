@@ -22,8 +22,28 @@ namespace CustomerAPI.WebAPI.Extensions
         public static IServiceCollection AddMyDbContext(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<CustomerDBContext>(options =>
-                options.UseMySQL(configuration.GetConnectionString("CustomerDbContext")));
-            services.AddMvp24HoursDbServiceAsync<CustomerDBContext>();
+                options.UseSqlServer(configuration.GetConnectionString("CustomerDbContext"))
+            );
+            services.AddMvp24HoursDbContext<CustomerDBContext>();
+            services.AddMvp24HoursRepositoryAsync(options: options =>
+            {
+                options.MaxQtyByQueryPage = 100;
+                options.TransactionIsolationLevel = System.Transactions.IsolationLevel.ReadCommitted;
+            });
+            return services;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IServiceCollection AddMyHealthChecks(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHealthChecks()
+                .AddSqlServer(
+                    configuration.GetConnectionString("CustomerDbContext"),
+                    healthQuery: "SELECT 1;",
+                    name: "SqlServer",
+                    failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded);
             return services;
         }
 

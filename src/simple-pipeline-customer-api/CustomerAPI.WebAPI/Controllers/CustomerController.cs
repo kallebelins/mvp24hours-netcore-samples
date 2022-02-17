@@ -3,6 +3,8 @@ using CustomerAPI.Core.ValueObjects.Customers;
 using CustomerAPI.WebAPI.Pipe.Operations.Customers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
+using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.Infrastructure.Pipe;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
@@ -34,7 +36,8 @@ namespace CustomerAPI.WebAPI.Controllers
         /// <summary>
         /// 
         /// </summary>
-        public CustomerController(IPipelineAsync pipeline)
+        public CustomerController(IPipelineAsync pipeline, ILoggingService logging, INotificationContext notification)
+            : base(logging, notification)
         {
             _pipeline = pipeline;
         }

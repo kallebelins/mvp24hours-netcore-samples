@@ -10,7 +10,7 @@ namespace CustomerAPI.Core.Contract.Logic
     /// </summary>
     public interface ICustomerService
     {
-        Task<IBusinessResult<IList<GetByCustomerResponse>>> GetBy(GetByCustomerFilterRequest filter);
-        Task<IBusinessResult<GetByIdCustomerResponse>> GetById(int id);
+        Task<IBusinessResult<IList<CustomerResult>>> GetBy(CustomerQuery filter);
+        Task<IBusinessResult<CustomerIdResult>> GetById(int id);
     }
 }

@@ -4,8 +4,11 @@ using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Resources;
 using CustomerAPI.Core.Specifications.Customers;
 using CustomerAPI.Core.ValueObjects.Customers;
+using FluentValidation;
 using Mvp24Hours.Application.Logic;
 using Mvp24Hours.Core.Contract.Data;
+using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
+using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.Infrastructure.Pipe;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
@@ -28,88 +31,70 @@ namespace CustomerAPI.Application.Logic
         #endregion
 
         #region [ Ctors ]
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public CustomerService(IPipelineAsync _pipeline)
+        public CustomerService(IUnitOfWorkAsync unitOfWork, ILoggingService logging, INotificationContext notification, IPipelineAsync pipeline)
+            : base(unitOfWork, logging, notification)
         {
-            pipeline = _pipeline;
+            this.pipeline = pipeline;
         }
-
         #endregion
 
         #region [ Queries ]
 
-        public async Task<IPagingResult<IList<GetByCustomerResponse>>> GetBy(GetByCustomerRequest filter, IPagingCriteria criteria, CancellationToken cancellationToken = default)
+        public async Task<IPagingResult<IList<CustomerResult>>> GetBy(CustomerQuery filter, IPagingCriteria criteria, CancellationToken cancellationToken = default)
         {
-            try
+            // apply filter default
+            Expression<Func<Customer, bool>> clause =
+                x => (string.IsNullOrEmpty(filter.Name) || x.Name.Contains(filter.Name))
+                    && (filter.Active == null || filter.Active.Value);
+
+            // has cell
+            if (filter.HasCellContact)
             {
-                // apply filter default
-                Expression<Func<Customer, bool>> clause =
-                    x => (string.IsNullOrEmpty(filter.Name) || x.Name.Contains(filter.Name))
-                        && (filter.Active == null || filter.Active.Value);
-
-                // has cell
-                if (filter.HasCellContact)
-                {
-                    clause = clause.And<Customer, CustomerHasCellContactSpec>();
-                }
-
-                // has email
-                if (filter.HasEmailContact)
-                {
-                    clause = clause.And<Customer, CustomerHasEmailContactSpec>();
-                }
-
-                // has no
-                if (filter.HasNoContact)
-                {
-                    clause = clause.And<Customer, CustomerHasNoContactSpec>();
-                }
-
-                // is prospect
-                if (filter.IsProspect)
-                {
-                    clause = clause.And<Customer, CustomerIsPropectSpec>();
-                }
-
-                // checks if there are any records in the database from the filter
-                if (!await Repository.GetByAnyAsync(clause, cancellationToken: cancellationToken))
-                {
-                    // reply with standard message for record not found
-                    return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
-                        .ToBusinessPaging<IList<GetByCustomerResponse>>();
-                }
-
-                // apply filter with pagination
-                return await GetByWithPaginationAsync(clause, criteria, cancellationToken: cancellationToken)
-                    .MapPagingToAsync<IList<Customer>, IList<GetByCustomerResponse>>();
+                clause = clause.And<Customer, CustomerHasCellContactSpec>();
             }
-            catch (Exception ex)
+
+            // has email
+            if (filter.HasEmailContact)
             {
-                Logging.Error(ex);
-                throw ex;
+                clause = clause.And<Customer, CustomerHasEmailContactSpec>();
             }
+
+            // has no
+            if (filter.HasNoContact)
+            {
+                clause = clause.And<Customer, CustomerHasNoContactSpec>();
+            }
+
+            // is prospect
+            if (filter.IsProspect)
+            {
+                clause = clause.And<Customer, CustomerIsPropectSpec>();
+            }
+
+            // apply filter with pagination
+            var result = await GetByWithPaginationAsync(clause, criteria, cancellationToken: cancellationToken);
+
+            // checks if there are any records in the database from the filter
+            if (!result.HasData())
+            {
+                // reply with standard message for record not found
+                return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
+                    .ToBusinessPaging<IList<CustomerResult>>();
+            }
+
+            // apply mapping
+            return result.MapPagingTo<IList<Customer>, IList<CustomerResult>>();
         }
 
-        public async Task<IBusinessResult<GetByIdCustomerResponse>> GetById(int id, CancellationToken cancellationToken = default)
+        public async Task<IBusinessResult<CustomerIdResult>> GetById(int id, CancellationToken cancellationToken = default)
         {
-            try
-            {
-                // create criteria to load navigation (contact)
-                var paging = new PagingCriteriaExpression<Customer>(3, 0);
-                paging.NavigationExpr.Add(x => x.Contacts);
+            // create criteria to load navigation (contact)
+            var paging = new PagingCriteriaExpression<Customer>(3, 0);
+            paging.NavigationExpr.Add(x => x.Contacts);
 
-                // try to retrieve identifier with navigation property
-                return await GetByIdAsync(id, paging, cancellationToken)
-                    .MapBusinessToAsync<Customer, GetByIdCustomerResponse>();
-            }
-            catch (Exception ex)
-            {
-                Logging.Error(ex);
-                throw ex;
-            }
+            // try to retrieve identifier with navigation property
+            return await GetByIdAsync(id, paging, cancellationToken)
+                .MapBusinessToAsync<Customer, CustomerIdResult>();
         }
 
         #endregion

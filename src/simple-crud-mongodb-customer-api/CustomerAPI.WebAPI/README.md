@@ -15,6 +15,7 @@ N-tier project used to develop APIs where the business needs to apply simple rul
 - Using ActionResult for API resources (Restful);
 - Middlewares for handling unmanaged failures;
 - DDD concepts;
+- Health Checks;
 
 ## Layers:
 
@@ -31,3 +32,4 @@ Layer that lies on the project boundary. We use this project to make the resourc
 
 ### MongoDb (Document Oriented)
 https://mvp24hours.dev/#/en-us/database/nosql?id=mongodb
+

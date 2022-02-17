@@ -2,6 +2,8 @@
 using CustomerAPI.Core.ValueObjects.Customers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
+using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Extensions;
 using Mvp24Hours.WebAPI.Controller;
@@ -18,23 +20,32 @@ namespace CustomerAPI.WebAPI.Controllers
     [ApiController]
     public class CustomerController : BaseMvpController
     {
+        #region [ Ctor ]
+        /// <summary>
+        /// 
+        /// </summary>
+        public CustomerController(ILoggingService logging, INotificationContext notification)
+            : base(logging, notification) { }
+
+        #endregion
+
         #region [ Actions / Resources ]
 
         /// <summary>
         /// Get list of customers
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<IList<GetByCustomerResponse>>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<IList<GetByCustomerResponse>>>), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<IList<GetByCustomerResponse>>>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<IList<CustomerResult>>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<IList<CustomerResult>>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<IList<CustomerResult>>>), StatusCodes.Status400BadRequest)]
         [Route("", Name = "CustomerGetBy")]
-        public async Task<ActionResult<IBusinessResult<IList<GetByCustomerResponse>>>> GetBy([FromQuery] GetByCustomerFilterRequest model)
+        public async Task<ActionResult<IBusinessResult<IList<CustomerResult>>>> GetBy([FromQuery] CustomerQuery model)
         {
             var result = await FacadeService.CustomerService.GetBy(model);
             // checks for failure in the notification context
             if (NotificationContext.HasErrorNotifications)
             {
-                return BadRequest(NotificationContext.ToBusiness<IList<GetByCustomerResponse>>());
+                return BadRequest(NotificationContext.ToBusiness<IList<CustomerResult>>());
             }
             else if (result.HasData())
             {
@@ -48,17 +59,17 @@ namespace CustomerAPI.WebAPI.Controllers
         /// Get customer with contact list
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<GetByIdCustomerResponse>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<GetByIdCustomerResponse>>), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ActionResult<IBusinessResult<GetByIdCustomerResponse>>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<CustomerIdResult>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<CustomerIdResult>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ActionResult<IBusinessResult<CustomerIdResult>>), StatusCodes.Status400BadRequest)]
         [Route("{id}", Name = "CustomerGetById")]
-        public async Task<ActionResult<IBusinessResult<GetByIdCustomerResponse>>> GetById(int id)
+        public async Task<ActionResult<IBusinessResult<CustomerIdResult>>> GetById(int id)
         {
             var result = await FacadeService.CustomerService.GetById(id);
             // checks for failure in the notification context
             if (NotificationContext.HasErrorNotifications)
             {
-                return BadRequest(NotificationContext.ToBusiness<GetByIdCustomerResponse>());
+                return BadRequest(NotificationContext.ToBusiness<CustomerIdResult>());
             }
             else if (result.HasData())
             {

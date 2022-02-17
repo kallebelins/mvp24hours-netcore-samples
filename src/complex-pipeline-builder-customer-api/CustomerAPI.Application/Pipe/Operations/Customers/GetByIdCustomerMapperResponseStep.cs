@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace CustomerAPI.Application.Pipe.Operations.Customers
 {
-    public class GetByIdCustomerMapperResponseStep : OperationMapperAsync<GetByIdCustomerResponse>
+    public class GetByIdCustomerMapperResponseStep : OperationMapperAsync<CustomerIdResult>
     {
-        public override async Task<GetByIdCustomerResponse> MapperAsync(IPipelineMessage input)
+        public override async Task<CustomerIdResult> MapperAsync(IPipelineMessage input)
         {
             if (!input.HasContent("customers"))
             {
@@ -25,28 +25,28 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
             if (NotificationContext.HasErrorNotifications)
             {
                 input.SetLock();
-                return await Task.FromResult<GetByIdCustomerResponse>(default);
+                return await Task.FromResult<CustomerIdResult>(default);
             }
 
             var id = input.GetContent<int>("id");
             var customers = input.GetContent<dynamic>("customers");
 
-            GetByIdCustomerResponse result = null;
+            CustomerIdResult result = null;
 
             foreach (var customer in customers)
             {
                 if (customer.id == id)
                 {
-                    result = new GetByIdCustomerResponse
+                    result = new CustomerIdResult
                     {
                         Id = customer.id,
                         Name = customer.name,
-                        Contacts = new List<GetByIdContactResponse>()
+                        Contacts = new List<ContactIdResult>()
                     };
 
                     if (customer.email != null)
                     {
-                        result.Contacts.Add(new GetByIdContactResponse
+                        result.Contacts.Add(new ContactIdResult
                         {
                             Description = customer.email,
                             Type = Core.Enums.ContactType.Email
@@ -55,7 +55,7 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
 
                     if (customer.phone != null)
                     {
-                        result.Contacts.Add(new GetByIdContactResponse
+                        result.Contacts.Add(new ContactIdResult
                         {
                             Description = customer.phone,
                             Type = Core.Enums.ContactType.CellPhone
@@ -64,7 +64,7 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
 
                     if (customer.website != null)
                     {
-                        result.Contacts.Add(new GetByIdContactResponse
+                        result.Contacts.Add(new ContactIdResult
                         {
                             Description = customer.website,
                             Type = Core.Enums.ContactType.Other

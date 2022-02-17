@@ -29,15 +29,15 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
             this.unitOfWorkAsync = ServiceProviderHelper.GetService<IUnitOfWorkAsync>();
         }
 
-        public override async Task<IPipelineMessage> ExecuteAsync(IPipelineMessage input)
+        public override async Task ExecuteAsync(IPipelineMessage input)
         {
             if (!input.HasContent("model-customers"))
             {
                 input.SetLock();
-                return input;
+                return;
             }
 
-            var customers = input.GetContent<IList<CreateCustomerRequest>>("model-customers");
+            var customers = input.GetContent<IList<CustomerCreate>>("model-customers");
 
             var repo = unitOfWorkAsync.GetRepository<Customer>();
 
@@ -48,8 +48,6 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
 
             int numberOfRecords = await unitOfWorkAsync.SaveChangesAsync();
             input.AddContent("numberOfRecords", numberOfRecords);
-
-            return input;
         }
     }
 }

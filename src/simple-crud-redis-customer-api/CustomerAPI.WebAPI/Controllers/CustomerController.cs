@@ -1,8 +1,11 @@
 ﻿using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Resources;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.Data;
+using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
+using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
 using Mvp24Hours.Extensions;
@@ -23,6 +26,7 @@ namespace CustomerAPI.WebAPI.Controllers
         #region [ Fields / Properties ]
 
         private readonly IRepositoryCacheAsync<CustomerDto> _repositoryCache;
+        private readonly IValidator<CustomerDto> validator;
 
         private IRepositoryCacheAsync<CustomerDto> RepositoryCache
         {
@@ -39,10 +43,11 @@ namespace CustomerAPI.WebAPI.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="repositoryCache"></param>
-        public CustomerController(IRepositoryCacheAsync<CustomerDto> repositoryCache)
+        public CustomerController(IRepositoryCacheAsync<CustomerDto> repositoryCache, ILoggingService logging, INotificationContext notification, IValidator<CustomerDto> validator)
+          : base(logging, notification)
         {
             _repositoryCache = repositoryCache;
+            this.validator = validator;
         }
 
         #endregion
@@ -81,7 +86,7 @@ namespace CustomerAPI.WebAPI.Controllers
                             .ToMessageResult(MessageType.Error)
                                 .ToBusiness<CustomerDto>());
             }
-            else if (!model.Validate())
+            else if (!model.Validate(NotificationContext, validator))
             {
                 return BadRequest(NotificationContext
                     .ToBusiness<CustomerDto>(

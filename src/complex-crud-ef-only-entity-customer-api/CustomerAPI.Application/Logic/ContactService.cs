@@ -1,14 +1,14 @@
 ﻿using CustomerAPI.Core.Contract.Logic;
 using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Resources;
+using FluentValidation;
 using Mvp24Hours.Application.Logic;
 using Mvp24Hours.Core.Contract.Data;
+using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
+using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
-using Mvp24Hours.Core.DTOs;
 using Mvp24Hours.Core.Enums;
-using Mvp24Hours.Core.ValueObjects.Logic;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -19,6 +19,15 @@ namespace CustomerAPI.Application.Logic
 {
     public class ContactService : RepositoryPagingServiceAsync<Contact, IUnitOfWorkAsync>, IContactService
     {
+        #region [ Ctor ]
+
+        public ContactService(IUnitOfWorkAsync unitOfWork, ILoggingService logging, INotificationContext notification, IValidator<Contact> validator)
+            : base(unitOfWork, logging, notification, validator)
+        {
+        }
+
+        #endregion
+
         #region [ Queries ]
 
         public async Task<IBusinessResult<IList<Contact>>> GetBy(int customerId, CancellationToken cancellationToken = default)
@@ -26,16 +35,18 @@ namespace CustomerAPI.Application.Logic
             // apply filter default
             Expression<Func<Contact, bool>> clause = x => x.CustomerId == customerId;
 
+            // try to get paginated data with criteria
+            var result = await GetByAsync(clause, cancellationToken: cancellationToken);
+
             // checks if there are any records in the database from the filter
-            if (!await Repository.GetByAnyAsync(clause, cancellationToken: cancellationToken))
+            if (!result.HasData())
             {
                 // reply with standard message for record not found
                 return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
-                    .ToBusinessPaging<IList<Contact>>();
+                    .ToBusiness<IList<Contact>>();
             }
 
-            // apply filter
-            return await GetByAsync(clause, cancellationToken: cancellationToken);
+            return result;
         }
 
         #endregion
@@ -50,14 +61,12 @@ namespace CustomerAPI.Application.Logic
             entityModel.CustomerId = customerId;
 
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (entityModel.Validate())
+            if (entityModel.Validate(NotificationContext, Validator)
+                && await AddAsync(entityModel, cancellationToken: cancellationToken) > 0)
             {
-                if (await AddAsync(entityModel, cancellationToken: cancellationToken) > 0)
-                {
-                    return entityModel.Id.ToBusiness(
-                        messageResult: Messages.OPERATION_SUCCESS
-                            .ToMessageResult("ContactCreate", MessageType.Success));
-                }
+                return entityModel.Id.ToBusiness(
+                    messageResult: Messages.OPERATION_SUCCESS
+                        .ToMessageResult("ContactCreate", MessageType.Success));
             }
 
             // get message in request context, if not, use default message
@@ -87,10 +96,10 @@ namespace CustomerAPI.Application.Logic
             entityModel.Created = entityDb.Created;
 
             // entity filling with received entity properties as input
-            AutoMapperHelper.Map<Contact>(entityDb, entityModel);
+            entityModel.CopyPropertiesTo(entityDb);
 
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (entityDb.Validate())
+            if (entityDb.Validate(NotificationContext, Validator))
             {
                 // apply changes to database
                 int affectedRows = await ModifyAsync(entityDb, cancellationToken: cancellationToken);

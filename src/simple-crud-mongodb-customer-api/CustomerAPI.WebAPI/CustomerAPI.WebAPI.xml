@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CustomerAPI.WebAPI</name>
+    </assembly>
+    <members>
+        <member name="T:CustomerAPI.WebAPI.Controllers.CustomerController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.#ctor(Mvp24Hours.Core.Contract.Data.IUnitOfWorkAsync,Mvp24Hours.Core.Contract.Infrastructure.Logging.ILoggingService,Mvp24Hours.Core.Contract.Infrastructure.Contexts.INotificationContext,FluentValidation.IValidator{CustomerAPI.Core.Entities.Customer})">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.GetBy(CustomerAPI.WebAPI.Models.CustomerQuery,Mvp24Hours.Core.DTOs.Models.PagingCriteriaRequest)">
+            <summary>
+            Get paginated list of customers
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.GetById(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Get customer with contact list
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.Create(CustomerAPI.Core.Entities.Customer,System.Threading.CancellationToken)">
+            <summary>
+            Create customer - allows you to send contacts
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.Update(System.String,CustomerAPI.Core.Entities.Customer,System.Threading.CancellationToken)">
+            <summary>
+            Update customer data
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.Delete(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Delete customer
+            </summary>
+        </member>
+        <member name="T:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyDbContext(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyHealthChecks(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:CustomerAPI.WebAPI.Models.CustomerQuery">
+            <summary>
+            Template for customer filter
+            </summary>
+        </member>
+        <member name="P:CustomerAPI.WebAPI.Models.CustomerQuery.Name">
+            <summary>
+            Client name
+            </summary>
+        </member>
+        <member name="P:CustomerAPI.WebAPI.Models.CustomerQuery.Active">
+            <summary>
+            Indicates whether the client is active/inactive
+            </summary>
+        </member>
+        <member name="T:CustomerAPI.WebAPI.Program">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Program.Main(System.String[])">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:CustomerAPI.WebAPI.Startup">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            
+            </summary>
+            <param name="configuration"></param>
+        </member>
+        <member name="P:CustomerAPI.WebAPI.Startup.Configuration">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -20,8 +20,25 @@ namespace CustomerAPI.WebAPI.Extensions
         /// </summary>
         public static IServiceCollection AddMyDbContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddMvp24HoursMongoDbAsync<CustomerDBContext>(
-                "DbCustomers", configuration.GetConnectionString("MongoDbContext"));
+            services.AddMvp24HoursDbContext<CustomerDBContext>(options =>
+            {
+                options.DatabaseName = "complexcustomers";
+                options.ConnectionString = configuration.GetConnectionString("MongoDbContext");
+            });
+            services.AddMvp24HoursRepositoryAsync();
+            return services;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IServiceCollection AddMyHealthChecks(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHealthChecks()
+                .AddMongoDb(
+                    configuration.GetConnectionString("MongoDbContext"),
+                    name: "MongoDb",
+                    failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded);
             return services;
         }
 
