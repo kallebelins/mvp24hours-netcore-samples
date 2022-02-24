@@ -36,15 +36,16 @@ namespace CustomerAPI.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             #region [ Mvp24Hours ]
-            services.AddMvp24HoursWebEssential(Configuration);
+            services.AddMvp24HoursWebEssential();
             services.AddMvp24HoursWebJson();
             services.AddMvp24HoursWebSwagger("Customer Pipeline Builder API", xmlCommentsFileName: "CustomerAPI.WebAPI.xml", enableExample: true);
             services.AddMvp24HoursWebGzip();
             services.AddMvp24HoursPipelineAsync();
             #endregion
 
-            services.AddMyServices();
-            services.AddHealthChecks();
+            services.AddMyTelemetry();
+            services.AddMyServices(Configuration);
+            services.AddMyHealthChecks();
 
             services.AddControllers();
             services.AddMvc();

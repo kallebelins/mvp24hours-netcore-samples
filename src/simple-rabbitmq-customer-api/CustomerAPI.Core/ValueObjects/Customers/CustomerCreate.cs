@@ -5,7 +5,7 @@ using System;
 
 namespace CustomerAPI.Core.ValueObjects.Customers
 {
-    public class CustomerCreate : MessageRequest, IMapFrom<Customer>
+    public class CustomerCreate : IMapFrom<Customer>
     {
         public string Name { get; set; }
         public string CellPhone { get; set; }

@@ -4,9 +4,9 @@ Download the file **"Mvp24Hours-Samples-VS-2019-2022-Templates.zip"** and extrac
 
 ## Template Folder on Windows:
 - **VS2019:**
-<br>%USERPROFILE%\Documents\Visual Studio 2019\
+<br>%USERPROFILE%\Documents\Visual Studio 2019\Templates\ProjectTemplates\Visual C#
 - **VS2022:**
-<br>%USERPROFILE%\Documents\Visual Studio 2022\
+<br>%USERPROFILE%\Documents\Visual Studio 2022\Templates\ProjectTemplates\Visual C#
 
 ## Template Folder on Mac:
 If you want to test it, help us.
@@ -19,9 +19,9 @@ Baixe o arquivo "Mvp24Hours-Samples-VS-2019-2022-Templates.zip" e extraia para a
 
 ## Pasta Template no Windows:
 - **VS2019:**
-<br>%USERPROFILE%\Documents\Visual Studio 2019\
+<br>%USERPROFILE%\Documents\Visual Studio 2019\Templates\ProjectTemplates\Visual C#
 - **VS2022:**
-<br>%USERPROFILE%\Documents\Visual Studio 2022\
+<br>%USERPROFILE%\Documents\Visual Studio 2022\Templates\ProjectTemplates\Visual C#
 
 ## Pasta Template no Mac:
 Se quiser testar nos ajude.

@@ -6,7 +6,6 @@ N-tier project used to develop APIs where the business needs to apply simple rul
 - Documentation (Swagger); 
 - Logging (NLog); 
 - Patterns for data validation (FluentValidation and Data Annotations);
-- Notification pattern;
 - Unit of Work (Transaction);
 - Repository (Paging, List, Create, Update, Delete) - Query apply: Filter, Paging - No navigation;
 - FluentAPI configuration EF;

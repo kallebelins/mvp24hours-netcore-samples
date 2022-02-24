@@ -38,17 +38,17 @@ namespace CustomerAPI.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             #region [ Mvp24Hours ]
-            services.AddMvp24HoursWebEssential(Configuration);
+            services.AddMvp24HoursWebEssential();
             services.AddMvp24HoursMapService(assemblyMap: typeof(Customer).Assembly);
             services.AddMvp24HoursWebJson();
             services.AddMvp24HoursWebSwagger("Customer EF API with Broker", xmlCommentsFileName: "CustomerAPI.WebAPI.xml", enableExample: true);
             services.AddMvp24HoursWebGzip();
-            services.AddMvp24HoursRabbitMQ();
             #endregion
 
+            services.AddMyTelemetry();
             services.AddMyServices();
             services.AddMyDbContext(Configuration);
-            services.AddMyRabbitProducer();
+            services.AddMyRabbitMQ(Configuration);
             services.AddMyHealthChecks(Configuration);
 
             services.AddControllers();

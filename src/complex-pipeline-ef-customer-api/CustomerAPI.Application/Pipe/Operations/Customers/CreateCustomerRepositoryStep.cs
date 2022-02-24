@@ -3,7 +3,6 @@ using CustomerAPI.Core.ValueObjects.Customers;
 using Mvp24Hours.Core.Contract.Data;
 using Mvp24Hours.Core.Contract.Infrastructure.Pipe;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.Helpers;
 using Mvp24Hours.Infrastructure.Pipe.Operations;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,16 +16,9 @@ namespace CustomerAPI.Application.Pipe.Operations.Customers
     {
         private readonly IUnitOfWorkAsync unitOfWorkAsync;
 
-        public CreateCustomerRepositoryStep()
+        public CreateCustomerRepositoryStep(IUnitOfWorkAsync unitOfWorkAsync)
         {
-            /*
-                // you can inject to get through the constructor
-                services.AddScoped(x =>
-                    new CreateCustomerRepositoryStep(x.GetRequiredService<IUnitOfWorkAsync>())
-                );
-            */
-
-            this.unitOfWorkAsync = ServiceProviderHelper.GetService<IUnitOfWorkAsync>();
+            this.unitOfWorkAsync = unitOfWorkAsync;
         }
 
         public override async Task ExecuteAsync(IPipelineMessage input)

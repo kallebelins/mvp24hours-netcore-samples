@@ -47,7 +47,7 @@ namespace CustomerAPI.Application.Logic
                 .GetContent<List<CustomerResult>>();
 
             // checks if there are any records
-            if (!result.AnyOrNotNull())
+            if (!result.AnySafe())
             {
                 // reply with standard message for record not found
                 return Messages.RECORD_NOT_FOUND

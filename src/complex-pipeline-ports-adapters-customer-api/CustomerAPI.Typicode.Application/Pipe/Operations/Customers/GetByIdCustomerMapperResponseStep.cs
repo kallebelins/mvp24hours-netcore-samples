@@ -14,17 +14,16 @@ namespace CustomerAPI.Typicode.Application.Pipe.Operations.Customers
         {
             if (!input.HasContent("customers"))
             {
-                NotificationContext.Add("GetByCustomerMapperResponseStep", Messages.RECORD_NOT_FOUND, Mvp24Hours.Core.Enums.MessageType.Error);
+                input.Messages.AddMessage("GetByCustomerMapperResponseStep", Messages.RECORD_NOT_FOUND, Mvp24Hours.Core.Enums.MessageType.Error);
             }
 
             if (!input.HasContent("id"))
             {
-                NotificationContext.Add("GetByCustomerMapperResponseStep", Messages.PARAMETER_ID_REQUIRED, Mvp24Hours.Core.Enums.MessageType.Error);
+                input.Messages.AddMessage("GetByCustomerMapperResponseStep", Messages.PARAMETER_ID_REQUIRED, Mvp24Hours.Core.Enums.MessageType.Error);
             }
 
-            if (NotificationContext.HasErrorNotifications)
+            if (input.IsFaulty)
             {
-                input.SetLock();
                 return await Task.FromResult<CustomerIdResult>(default);
             }
 

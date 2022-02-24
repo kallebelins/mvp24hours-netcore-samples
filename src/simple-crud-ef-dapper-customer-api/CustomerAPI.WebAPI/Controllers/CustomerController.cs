@@ -7,13 +7,10 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.Data;
-using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
-using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.DTOs.Models;
 using Mvp24Hours.Core.Enums;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.WebAPI.Controller;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -28,7 +25,7 @@ namespace CustomerAPI.WebAPI.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : BaseMvpController
+    public class CustomerController : ControllerBase
     {
         #region [ Fields / Properties ]
 
@@ -53,8 +50,7 @@ namespace CustomerAPI.WebAPI.Controllers
         /// <summary>
         /// 
         /// </summary>
-        public CustomerController(IUnitOfWorkAsync uoW, ILoggingService logging, INotificationContext notification, IValidator<Customer> validator)
-            : base(logging, notification)
+        public CustomerController(IUnitOfWorkAsync uoW, IValidator<Customer> validator)
         {
             this.unitOfWork = uoW;
             this.validator = validator;
@@ -139,7 +135,9 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<Customer>>> Create([FromBody] Customer model, CancellationToken cancellationToken)
         {
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (model.Validate(NotificationContext, validator))
+            var errors = model.TryValidate(validator);
+
+            if (!errors.AnySafe())
             {
                 await Repository.AddAsync(model, cancellationToken);
                 if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
@@ -148,7 +146,7 @@ namespace CustomerAPI.WebAPI.Controllers
                 }
             }
             // get message in request context, if not, use default message
-            return BadRequest(NotificationContext
+            return BadRequest(errors
                 .ToBusiness<Customer>(
                     defaultMessage: Messages.OPERATION_FAIL
                         .ToMessageResult(MessageType.Error))
@@ -167,7 +165,9 @@ namespace CustomerAPI.WebAPI.Controllers
         public async Task<ActionResult<IBusinessResult<Customer>>> Update(int id, [FromBody] Customer model, CancellationToken cancellationToken)
         {
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (model.Validate(NotificationContext, validator))
+            var errors = model.TryValidate(validator);
+
+            if (!errors.AnySafe())
             {
                 // gets entity through the identifier informed in the resource
                 var modelDb = await Repository.GetByIdAsync(id, cancellationToken);
@@ -194,7 +194,7 @@ namespace CustomerAPI.WebAPI.Controllers
                 }
             }
             // get message in request context, if not, use default message
-            return BadRequest(NotificationContext
+            return BadRequest(errors
                 .ToBusiness<Customer>(
                     defaultMessage: Messages.OPERATION_FAIL
                         .ToMessageResult(MessageType.Error))
@@ -229,10 +229,9 @@ namespace CustomerAPI.WebAPI.Controllers
                         .ToBusiness<Customer>());
             }
             // get message in request context, if not, use default message
-            return BadRequest(NotificationContext
-                .ToBusiness<Customer>(
-                    defaultMessage: Messages.OPERATION_FAIL
-                        .ToMessageResult(MessageType.Error))
+            return BadRequest(Messages.OPERATION_FAIL
+                .ToMessageResult(MessageType.Error)
+                .ToBusiness<Customer>()
             );
         }
 

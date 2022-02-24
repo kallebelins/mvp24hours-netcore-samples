@@ -6,7 +6,6 @@ N-layer project used to develop APIs where the business needs to apply simple ru
 - Documentation (Swagger); 
 - Logging (NLog); 
 - Patterns for data validation (FluentValidation and Data Annotations);
-- Notification pattern;
 - Repository (Get, Create, Delete);
 - Dependency injection (IoC);
 - Using ActionResult for API resources (Restful);

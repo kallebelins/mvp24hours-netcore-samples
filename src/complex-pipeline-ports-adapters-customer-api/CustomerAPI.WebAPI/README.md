@@ -9,7 +9,6 @@ The pipeline pattern is used to perform service integration, since we have contr
 - Ports and Adapters pattern;
 - Documentation (Swagger); 
 - Logging (NLog); 
-- Notification pattern;
 - Facade pattern;
 - Dependency injection (IoC);
 - Using ActionResult for API resources (Restful);

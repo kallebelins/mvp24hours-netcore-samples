@@ -9,7 +9,12 @@
             
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.#ctor(Mvp24Hours.Core.Contract.Data.IUnitOfWorkAsync,Mvp24Hours.Core.Contract.Infrastructure.Logging.ILoggingService,Mvp24Hours.Core.Contract.Infrastructure.Contexts.INotificationContext,FluentValidation.IValidator{CustomerAPI.Core.Entities.Customer})">
+        <member name="P:CustomerAPI.WebAPI.Controllers.CustomerController.Repository">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.#ctor(Mvp24Hours.Core.Contract.Data.IUnitOfWorkAsync,FluentValidation.IValidator{CustomerAPI.Core.Entities.Customer})">
             <summary>
             
             </summary>
@@ -55,6 +60,11 @@
             </summary>
         </member>
         <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyTelemetry(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             
             </summary>

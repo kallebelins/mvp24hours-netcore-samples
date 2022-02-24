@@ -1,4 +1,5 @@
-﻿using Mvp24Hours.Core.Contract.Infrastructure.Pipe;
+﻿using Microsoft.Extensions.Configuration;
+using Mvp24Hours.Core.Contract.Infrastructure.Pipe;
 using Mvp24Hours.Extensions;
 using Mvp24Hours.Helpers;
 using Mvp24Hours.Infrastructure.Pipe.Operations;
@@ -11,17 +12,26 @@ namespace CustomerAPI.WebAPI.Pipe.Operations.Customers
     /// </summary>
     public class GetCustomerClientStep : OperationBaseAsync
     {
+        private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public GetCustomerClientStep(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         public override async Task ExecuteAsync(IPipelineMessage input)
         {
-            string url = ConfigurationHelper.GetSettings("Settings:TypicodeCustomerUrl");
+            string url = configuration.GetSection("Settings:TypicodeCustomerUrl").Value;
 
             if (!url.HasValue())
             {
-                NotificationContext.Add("GetCustomerClientStep", "Typicode service url not found in configuration (appsettings).", Mvp24Hours.Core.Enums.MessageType.Error);
-                input.SetLock();
+                input.Messages.AddMessage("GetCustomerClientStep", "Typicode service url not found in configuration (appsettings).", Mvp24Hours.Core.Enums.MessageType.Error);
                 return;
             }
 

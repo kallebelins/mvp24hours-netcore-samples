@@ -1,4 +1,4 @@
-# mvp24hours-netcore-samples
+# mvp24hours-netcore-samples (v3.2.241)
 Samples for quick product building using: Relational database (SQL Server, PostgreSql, MySql); NoSql database (MongoDb); Key-value database (Redis); Message Broker (RabbitMQ); Pipeline (Pipe and Filters pattern); Documentation (Swagger); Mapping (AutoMapper); Logging (NLog); Patterns for data validation (FluentValidation and Data Annotations), notification (Notification pattern) and specifications (Specification pattern), unit of work, repository, among others.
 In each project there is a file with the description of the resources and implemented references. Read the "Readme.md" file in the "...WebAPI" folder.
 
@@ -14,6 +14,10 @@ Visit: https://github.com/kallebelins/mvp24hours-netcore-samples/tree/main/vstem
 
 ### Simple
 N-tier project used to develop APIs where the business needs to apply simple rules.
+
+#### Health Checks
+**[Simple WebStatus](https://github.com/kallebelins/mvp24hours-netcore-samples/tree/main/src/simple-webstatus)**
+Allows you to monitor the health of applications and tools (SqlServer, PostgreSql, MySql, RabbitMQ, MongoDB, Redis, ...).
 
 #### Relational Database (MySql, PostgreSql, SqlServer)
 **[CRUD - EF - Simple](https://github.com/kallebelins/mvp24hours-netcore-samples/tree/main/src/simple-crud-ef-customer-api/CustomerAPI.WebAPI)**

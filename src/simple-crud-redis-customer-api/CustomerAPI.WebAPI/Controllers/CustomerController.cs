@@ -4,12 +4,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.Data;
-using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
-using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.WebAPI.Controller;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +18,7 @@ namespace CustomerAPI.WebAPI.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : BaseMvpController
+    public class CustomerController : ControllerBase
     {
         #region [ Fields / Properties ]
 
@@ -43,8 +40,7 @@ namespace CustomerAPI.WebAPI.Controllers
         /// <summary>
         /// 
         /// </summary>
-        public CustomerController(IRepositoryCacheAsync<CustomerDto> repositoryCache, ILoggingService logging, INotificationContext notification, IValidator<CustomerDto> validator)
-          : base(logging, notification)
+        public CustomerController(IRepositoryCacheAsync<CustomerDto> repositoryCache, IValidator<CustomerDto> validator)
         {
             _repositoryCache = repositoryCache;
             this.validator = validator;
@@ -63,7 +59,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{key}", Name = "CustomerGetById")]
         public async Task<ActionResult<CustomerDto>> GetById(string key, CancellationToken cancellationToken)
         {
-            var result = await RepositoryCache.GetAsync(key);
+            var result = await RepositoryCache.GetAsync(key, cancellationToken: cancellationToken);
             if (result == null)
             {
                 return NotFound(result);
@@ -86,15 +82,18 @@ namespace CustomerAPI.WebAPI.Controllers
                             .ToMessageResult(MessageType.Error)
                                 .ToBusiness<CustomerDto>());
             }
-            else if (!model.Validate(NotificationContext, validator))
+
+            var result = model.TryValidate(validator);
+            if (result.AnySafe())
             {
-                return BadRequest(NotificationContext
+                return BadRequest(result
                     .ToBusiness<CustomerDto>(
                         defaultMessage: Messages.OPERATION_FAIL
                             .ToMessageResult(MessageType.Error))
                 );
             }
-            await RepositoryCache.SetAsync(key, model);
+
+            await RepositoryCache.SetAsync(key, model, cancellationToken: cancellationToken);
             return Created(nameof(Create), key);
         }
 
@@ -106,7 +105,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{key}", Name = "CustomerDelete")]
         public async Task<ActionResult> Delete(string key, CancellationToken cancellationToken)
         {
-            await RepositoryCache.RemoveAsync(key);
+            await RepositoryCache.RemoveAsync(key, cancellationToken: cancellationToken);
             return Ok();
         }
 

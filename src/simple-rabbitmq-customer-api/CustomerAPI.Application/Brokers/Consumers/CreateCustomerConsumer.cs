@@ -1,39 +1,45 @@
 using CustomerAPI.Core.ValueObjects.Customers;
-using Microsoft.Extensions.Options;
-using Mvp24Hours.Core.Contract.Infrastructure.Logging;
-using Mvp24Hours.Infrastructure.RabbitMQ;
-using Mvp24Hours.Infrastructure.RabbitMQ.Configuration;
-using System.Diagnostics;
+using Mvp24Hours.Core.Enums.Infrastructure;
+using Mvp24Hours.Helpers;
+using Mvp24Hours.Infrastructure.RabbitMQ.Core.Contract;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace CustomerAPI.Application.Brokers.Consumers
 {
-    public class CreateCustomerConsumer : MvpRabbitMQConsumerAsync<CustomerCreate>
+    public class CreateCustomerConsumer : IMvpRabbitMQConsumerAsync
     {
-        public CreateCustomerConsumer(IOptions<RabbitMQOptions> options, ILoggingService logging)
-            : base(options, logging) { }
+        public string RoutingKey => typeof(CustomerCreate).Name;
 
-        public override async Task ReceivedAsync(object message)
+        public string QueueName => typeof(CustomerCreate).Name;
+
+        public async Task ReceivedAsync(object message, string token)
         {
-            try
+            if (message is not CustomerCreate dto)
             {
-                var dto = message as CustomerCreate;
+                TelemetryHelper.Execute(TelemetryLevel.Verbose, "create-customer-consumer-received-null", "Received customer create null.");
+                return;
+            }
+            TelemetryHelper.Execute(TelemetryLevel.Verbose, "create-customer-consumer-received", $"Received customer create {dto.Name}");
+            var result = await FacadeService.CustomerService.Create(dto);
+            if (result.HasErrors)
+            {
+                throw new System.InvalidOperationException(string.Join(" | ", result.Messages.Select(x => x.Message).ToArray()));
+            }
+        }
 
-                if (dto == null)
-                {
-                    Trace.WriteLine($"Received customer create null.");
-                    return;
-                }
-                Trace.WriteLine($"Received customer create {dto.Name}");
-                var result = await FacadeService.CustomerService.Create(dto);
-                if (result.HasErrors)
-                    throw new System.InvalidOperationException(string.Join(" | ", result.Messages.Select(x => x.Message).ToArray()));
-            }
-            catch (System.Exception ex)
-            {
-                Logging.Error(ex);
-            }
+        public async Task FailureAsync(Exception exception, string token)
+        {
+            // perform handling for integration failures in RabbitMQ
+            // write to temp table, send email, create specialized log, etc.
+            await Task.CompletedTask;
+        }
+
+        public async Task RejectedAsync(object message, string token)
+        {
+            // we tried to consume the resource for 3 times, in this case as we did not treat it, we will disregard
+            await Task.CompletedTask;
         }
     }
 }

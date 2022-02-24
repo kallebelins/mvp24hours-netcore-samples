@@ -4,12 +4,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.Data;
-using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
-using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.WebAPI.Controller;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
@@ -23,7 +20,7 @@ namespace CustomerAPI.WebAPI.Controllers
     [Produces("application/json")]
     [Route("api/Customer")]
     [ApiController]
-    public class ContactController : BaseMvpController
+    public class ContactController : ControllerBase
     {
         #region [ Fields / Properties ]
 
@@ -48,8 +45,7 @@ namespace CustomerAPI.WebAPI.Controllers
         /// <summary>
         /// 
         /// </summary>
-        public ContactController(IUnitOfWorkAsync uoW, ILoggingService logging, INotificationContext notification, IValidator<Contact> validator)
-            : base(logging, notification)
+        public ContactController(IUnitOfWorkAsync uoW, IValidator<Contact> validator)
         {
             this.unitOfWork = uoW;
             this.validator = validator;
@@ -72,7 +68,7 @@ namespace CustomerAPI.WebAPI.Controllers
             var result = await Repository.GetByAsync(x => x.CustomerId == customerId, cancellationToken: cancellationToken);
 
             // checks if there are any records in the database from the filter
-            if (!result.AnyOrNotNull())
+            if (!result.AnySafe())
             {
                 // reply with standard message for record not found
                 return NotFound(Messages.RECORD_NOT_FOUND
@@ -90,10 +86,12 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<Contact>>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<Contact>>), StatusCodes.Status400BadRequest)]
         [Route("{customerId:int}/Contact", Name = "ContactCreate")]
-        public async Task<ActionResult<IBusinessResult<IList<Contact>>>> Create(int customerId, [FromBody] Contact model, CancellationToken cancellationToken)
+        public async Task<ActionResult<IBusinessResult<Contact>>> Create(int customerId, [FromBody] Contact model, CancellationToken cancellationToken)
         {
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (model.Validate(NotificationContext, validator))
+            var errors = model.TryValidate(validator);
+
+            if (!errors.AnySafe())
             {
                 model.CustomerId = customerId;
                 await Repository.AddAsync(model, cancellationToken);
@@ -103,7 +101,7 @@ namespace CustomerAPI.WebAPI.Controllers
                 }
             }
             // get message in request context, if not, use default message
-            return BadRequest(NotificationContext
+            return BadRequest(errors
                 .ToBusiness<Contact>(
                     defaultMessage: Messages.OPERATION_FAIL
                         .ToMessageResult(MessageType.Error))
@@ -119,10 +117,12 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<Contact>>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status304NotModified)]
         [Route("{customerId:int}/Contact/{id}", Name = "ContactUpdate")]
-        public async Task<ActionResult<IBusinessResult<IList<Contact>>>> Update(int customerId, int id, [FromBody] Contact model, CancellationToken cancellationToken)
+        public async Task<ActionResult<IBusinessResult<Contact>>> Update(int customerId, int id, [FromBody] Contact model, CancellationToken cancellationToken)
         {
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (model.Validate(NotificationContext, validator))
+            var errors = model.TryValidate(validator);
+
+            if (!errors.AnySafe())
             {
                 // get entity through contact and customer identifier
                 var modelDb = await Repository.GetByAsync(x => x.Id == id && x.CustomerId == customerId, cancellationToken)
@@ -151,7 +151,7 @@ namespace CustomerAPI.WebAPI.Controllers
                 }
             }
             // get message in request context, if not, use default message
-            return BadRequest(NotificationContext
+            return BadRequest(errors
                 .ToBusiness<Contact>(
                     defaultMessage: Messages.OPERATION_FAIL
                         .ToMessageResult(MessageType.Error))
@@ -166,7 +166,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<Contact>>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ActionResult<IBusinessResult<Contact>>), StatusCodes.Status400BadRequest)]
         [Route("{customerId:int}/Contact/{id}", Name = "ContactDelete")]
-        public async Task<ActionResult<IBusinessResult<IList<Contact>>>> Delete(int customerId, int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<IBusinessResult<Contact>>> Delete(int customerId, int id, CancellationToken cancellationToken)
         {
             // try to retrieve entity by identifier
             var model = await Repository.GetByAsync(x => x.Id == id && x.CustomerId == customerId, cancellationToken)
@@ -187,10 +187,9 @@ namespace CustomerAPI.WebAPI.Controllers
                         .ToBusiness<Contact>());
             }
             // get message in request context, if not, use default message
-            return BadRequest(NotificationContext
-                .ToBusiness<Contact>(
-                    defaultMessage: Messages.OPERATION_FAIL
-                        .ToMessageResult(MessageType.Error))
+            return BadRequest(Messages.OPERATION_FAIL
+                .ToMessageResult(MessageType.Error)
+                .ToBusiness<Contact>()
             );
         }
 

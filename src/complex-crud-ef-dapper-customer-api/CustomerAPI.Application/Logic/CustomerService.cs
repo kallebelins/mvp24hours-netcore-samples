@@ -7,8 +7,6 @@ using Dapper;
 using FluentValidation;
 using Mvp24Hours.Application.Logic;
 using Mvp24Hours.Core.Contract.Data;
-using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
-using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
 using Mvp24Hours.Extensions;
@@ -24,8 +22,8 @@ namespace CustomerAPI.Application.Logic
     {
         #region [ Ctor ]
 
-        public CustomerService(IUnitOfWorkAsync unitOfWork, ILoggingService logging, INotificationContext notification, IValidator<Customer> validator)
-            : base(unitOfWork, logging, notification, validator)
+        public CustomerService(IUnitOfWorkAsync unitOfWork, IValidator<Customer> validator)
+            : base(unitOfWork, validator)
         {
         }
 
@@ -121,20 +119,25 @@ namespace CustomerAPI.Application.Logic
             var entity = dto.MapTo<Customer>();
 
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (entity.Validate(NotificationContext, Validator)
-                && await AddAsync(entity, cancellationToken: cancellationToken) > 0)
+            var errors = entity.TryValidate(Validator);
+            if (errors.AnySafe())
+            {
+                return errors.ToBusiness<int>();
+            }
+
+            // perform create action on the database
+            await Repository.AddAsync(entity, cancellationToken: cancellationToken);
+            if (await UnitOfWork.SaveChangesAsync(cancellationToken: cancellationToken) > 0)
             {
                 return entity.Id.ToBusiness(
                     Messages.OPERATION_SUCCESS
                         .ToMessageResult("CustomerCreate", MessageType.Success));
             }
 
-            // get message in request context, if not, use default message
-            return NotificationContext
-                .ToBusiness<int>(
-                    defaultMessage: Messages.OPERATION_FAIL
-                        .ToMessageResult(MessageType.Error)
-            );
+            // unknown error
+            return Messages.OPERATION_FAIL
+                .ToMessageResult(MessageType.Error)
+                .ToBusiness<int>();
         }
 
         public async Task<IBusinessResult<int>> Update(int id, CustomerUpdate dto, CancellationToken cancellationToken = default)
@@ -148,32 +151,30 @@ namespace CustomerAPI.Application.Logic
                         .ToBusiness<int>();
             }
 
-            // preenchimento entidade com propriedades do DTO
+            // entity populating with DTO properties
             AutoMapperHelper.Map<Customer>(entity, dto);
 
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
-            if (entity.Validate(NotificationContext, Validator))
+            var errors = entity.TryValidate(Validator);
+            if (errors.AnySafe())
             {
-                // apply changes to database
-                int affectedRows = await ModifyAsync(entity, cancellationToken: cancellationToken);
-                if (affectedRows > 0)
-                {
-                    return affectedRows.ToBusiness(
-                        Messages.OPERATION_SUCCESS
-                            .ToMessageResult("Update", MessageType.Success));
-                }
-                else
-                {
-                    return affectedRows.ToBusiness();
-                }
+                return errors.ToBusiness<int>();
             }
 
-            // get message in request context, if not, use default message
-            return NotificationContext
-                .ToBusiness<int>(
-                    defaultMessage: Messages.OPERATION_FAIL
-                        .ToMessageResult(MessageType.Error)
-            );
+            // apply changes to database
+            await Repository.ModifyAsync(entity, cancellationToken: cancellationToken);
+            int affectedRows = await UnitOfWork.SaveChangesAsync(cancellationToken: cancellationToken);
+            if (affectedRows > 0)
+            {
+                return affectedRows.ToBusiness(
+                    Messages.OPERATION_SUCCESS
+                        .ToMessageResult("Update", MessageType.Success));
+            }
+
+            // unknown error
+            return Messages.OPERATION_FAIL
+                .ToMessageResult(MessageType.Error)
+                .ToBusiness<int>();
         }
 
         public async Task<IBusinessResult<int>> Delete(int id, CancellationToken cancellationToken = default)
@@ -187,8 +188,9 @@ namespace CustomerAPI.Application.Logic
                         .ToBusiness<int>();
             }
 
-            // perform delete action
-            int affectedRows = await RemoveAsync(entity, cancellationToken: cancellationToken);
+            // performs delete action on the database
+            await Repository.RemoveAsync(entity, cancellationToken: cancellationToken);
+            int affectedRows = await UnitOfWork.SaveChangesAsync(cancellationToken: cancellationToken);
             if (affectedRows > 0)
             {
                 return affectedRows.ToBusiness(
@@ -196,12 +198,10 @@ namespace CustomerAPI.Application.Logic
                         .ToMessageResult("Delete", MessageType.Success));
             }
 
-            // get message in request context, if not, use default message
-            return NotificationContext
-                .ToBusiness<int>(
-                    defaultMessage: Messages.OPERATION_FAIL
-                        .ToMessageResult(MessageType.Error)
-            );
+            // unknown error
+            return Messages.OPERATION_FAIL
+                .ToMessageResult(MessageType.Error)
+                .ToBusiness<int>();
         }
 
         #endregion

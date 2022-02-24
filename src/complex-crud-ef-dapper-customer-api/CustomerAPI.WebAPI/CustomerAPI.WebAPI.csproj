@@ -14,8 +14,10 @@
 		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="3.1.2" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-		<PackageReference Include="Mvp24Hours.WebAPI" Version="3.2.171" />
+		<PackageReference Include="Mvp24Hours.WebAPI" Version="3.2.241" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.10" />
+		<PackageReference Include="NLog" Version="4.7.14" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="4.14.0" />
 	</ItemGroup>
 
 	<ItemGroup>

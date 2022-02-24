@@ -9,7 +9,7 @@
             
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.#ctor(Mvp24Hours.Infrastructure.RabbitMQ.MvpRabbitMQProducer{CustomerAPI.Core.ValueObjects.Customers.CustomerCreate},Mvp24Hours.Infrastructure.RabbitMQ.MvpRabbitMQProducer{CustomerAPI.Core.ValueObjects.Customers.CustomerUpdate},Mvp24Hours.Infrastructure.RabbitMQ.MvpRabbitMQProducer{CustomerAPI.Core.ValueObjects.Customers.CustomerDelete})">
+        <member name="M:CustomerAPI.WebAPI.Controllers.CustomerController.#ctor(Mvp24Hours.Infrastructure.RabbitMQ.MvpRabbitMQClient)">
             <summary>
             
             </summary>
@@ -54,17 +54,17 @@
             
             </summary>
         </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyTelemetry(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyRabbitProducer(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyRabbitConsumer(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyRabbitMQ(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             
             </summary>

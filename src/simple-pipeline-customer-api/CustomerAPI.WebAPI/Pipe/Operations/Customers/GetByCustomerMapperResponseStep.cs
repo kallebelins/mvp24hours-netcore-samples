@@ -20,8 +20,7 @@ namespace CustomerAPI.WebAPI.Pipe.Operations.Customers
         {
             if (!input.HasContent("customers"))
             {
-                NotificationContext.Add("GetByCustomerMapperResponseStep", Messages.RECORD_NOT_FOUND, Mvp24Hours.Core.Enums.MessageType.Error);
-                input.SetLock();
+                input.Messages.AddMessage("GetByCustomerMapperResponseStep", Messages.RECORD_NOT_FOUND, Mvp24Hours.Core.Enums.MessageType.Error);
                 return await Task.FromResult<IList<GetByCustomerResponse>>(default);
             }
 

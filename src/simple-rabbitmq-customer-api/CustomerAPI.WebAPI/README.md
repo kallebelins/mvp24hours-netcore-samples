@@ -7,7 +7,6 @@ N-layer project used to develop APIs where the business needs to apply complex r
 - Mapping (AutoMapper); 
 - Logging (NLog); 
 - Patterns for data validation (FluentValidation and Data Annotations);
-- Notification pattern;
 - Unit of Work (Transaction);
 - Repository (Paging, List, Create, Update, Delete) - Query apply: Filter, Paging;
 - FluentAPI configuration EF;

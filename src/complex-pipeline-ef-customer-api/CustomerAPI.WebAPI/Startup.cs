@@ -38,7 +38,7 @@ namespace CustomerAPI.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             #region [ Mvp24Hours ]
-            services.AddMvp24HoursWebEssential(Configuration);
+            services.AddMvp24HoursWebEssential();
             services.AddMvp24HoursMapService(assemblyMap: Assembly.GetExecutingAssembly());
             services.AddMvp24HoursWebJson();
             services.AddMvp24HoursWebSwagger("Customer Pipeline EF API", xmlCommentsFileName: "CustomerAPI.WebAPI.xml", enableExample: true);
@@ -46,7 +46,8 @@ namespace CustomerAPI.WebAPI
             services.AddMvp24HoursPipelineAsync();
             #endregion
 
-            services.AddMyServices();
+            services.AddMyTelemetry();
+            services.AddMyServices(Configuration);
             services.AddMyDbContext(Configuration);
             services.AddMyHealthChecks(Configuration);
 

@@ -6,8 +6,6 @@ using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.DTOs.Models;
 using Mvp24Hours.Extensions;
 using Mvp24Hours.Infrastructure.RabbitMQ;
-using Mvp24Hours.Infrastructure.RabbitMQ.Core.Contract;
-using Mvp24Hours.WebAPI.Controller;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,13 +18,11 @@ namespace CustomerAPI.WebAPI.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : BaseMvpController
+    public class CustomerController : ControllerBase
     {
         #region [ Properties / Fields ]
 
-        private readonly MvpRabbitMQProducer<CustomerCreate> createProducer;
-        private readonly MvpRabbitMQProducer<CustomerUpdate> updateProducer;
-        private readonly MvpRabbitMQProducer<CustomerDelete> deteleProducer;
+        private readonly MvpRabbitMQClient rabbitMQClient;
 
         #endregion
 
@@ -35,14 +31,9 @@ namespace CustomerAPI.WebAPI.Controllers
         /// <summary>
         /// 
         /// </summary>
-        public CustomerController(
-            MvpRabbitMQProducer<CustomerCreate> createProducer,
-            MvpRabbitMQProducer<CustomerUpdate> updateProducer,
-            MvpRabbitMQProducer<CustomerDelete> deteleProducer)
+        public CustomerController(MvpRabbitMQClient rabbitMQClient)
         {
-            this.createProducer = createProducer;
-            this.updateProducer = updateProducer;
-            this.deteleProducer = deteleProducer;
+            this.rabbitMQClient = rabbitMQClient;
         }
 
         #endregion
@@ -91,8 +82,8 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("", Name = "CustomerCreate")]
         public ActionResult Create([FromBody] CustomerCreate model)
         {
-            createProducer.Publish(model);
-            return Created(nameof(Create), model.Token);
+            string token = rabbitMQClient.Publish(model, typeof(CustomerCreate).Name);
+            return Created(nameof(Create), token);
         }
 
         /// <summary>
@@ -104,8 +95,8 @@ namespace CustomerAPI.WebAPI.Controllers
         public ActionResult Update(int id, [FromBody] CustomerUpdate model)
         {
             model.Id = id;
-            updateProducer.Publish(model);
-            return Created(nameof(Create), model.Token);
+            string token = rabbitMQClient.Publish(model, typeof(CustomerUpdate).Name);
+            return Created(nameof(Create), token);
         }
 
         /// <summary>
@@ -117,8 +108,8 @@ namespace CustomerAPI.WebAPI.Controllers
         public ActionResult Delete(int id)
         {
             var model = new CustomerDelete() { Id = id };
-            deteleProducer.Publish(model);
-            return Created(nameof(Create), model.Token);
+            string token = rabbitMQClient.Publish(model, typeof(CustomerDelete).Name);
+            return Created(nameof(Create), token);
         }
 
         #endregion

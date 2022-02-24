@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.WebAPI.Controller;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
@@ -19,7 +18,7 @@ namespace CustomerAPI.WebAPI.Controllers
     [Produces("application/json")]
     [Route("api/Customer")]
     [ApiController]
-    public class ContactController : BaseMvpController
+    public class ContactController : ControllerBase
     {
         #region [ Actions / Resources ]
 

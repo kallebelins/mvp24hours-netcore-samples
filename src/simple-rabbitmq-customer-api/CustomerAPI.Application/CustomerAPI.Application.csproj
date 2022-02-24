@@ -6,8 +6,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Mvp24Hours.Application" Version="3.2.171" />
-	  <PackageReference Include="Mvp24Hours.Infrastructure.RabbitMQ" Version="3.2.171" />
+	  <PackageReference Include="Mvp24Hours.Application" Version="3.2.241" />
+	  <PackageReference Include="Mvp24Hours.Infrastructure.RabbitMQ" Version="3.2.241" />
 	</ItemGroup>
 
 	<ItemGroup>

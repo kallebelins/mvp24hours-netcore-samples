@@ -7,7 +7,12 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Mvp24Hours.Core.Enums.Infrastructure;
+using Mvp24Hours.Core.Extensions;
 using Mvp24Hours.Extensions;
+using NLog;
+using System;
+using System.Linq;
 
 namespace CustomerAPI.WebAPI.Extensions
 {
@@ -57,6 +62,43 @@ namespace CustomerAPI.WebAPI.Extensions
 
             services.AddSingleton<IValidator<Customer>, CustomerValidator>();
             services.AddSingleton<IValidator<Contact>, ContactValidator>();
+            return services;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IServiceCollection AddMyTelemetry(this IServiceCollection services)
+        {
+            Logger logger = LogManager.GetCurrentClassLogger();
+#if DEBUG
+            services.AddMvp24HoursTelemetry(TelemetryLevel.Information | TelemetryLevel.Verbose,
+                (name, state) =>
+                {
+                    if (name.EndsWith("-object"))
+                    {
+                        logger.Info($"{name}|body:{state.ToSerialize()}");
+                    }
+                    else
+                    {
+                        logger.Info($"{name}|{string.Join("|", state)}");
+                    }
+                }
+            );
+#endif
+            services.AddMvp24HoursTelemetry(TelemetryLevel.Error,
+                (name, state) =>
+                {
+                    if (name.EndsWith("-failure"))
+                    {
+                        logger.Error(state.ElementAtOrDefault(0) as Exception);
+                    }
+                    else
+                    {
+                        logger.Error($"{name}|{string.Join("|", state)}");
+                    }
+                }
+            );
             return services;
         }
     }

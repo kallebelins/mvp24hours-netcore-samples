@@ -2,11 +2,8 @@
 using CustomerAPI.Core.ValueObjects.Customers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
-using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.WebAPI.Controller;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -18,16 +15,8 @@ namespace CustomerAPI.WebAPI.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : BaseMvpController
+    public class CustomerController : ControllerBase
     {
-        #region [ Ctor ]
-        /// <summary>
-        /// 
-        /// </summary>
-        public CustomerController(ILoggingService logging, INotificationContext notification)
-            : base(logging, notification) { }
-        #endregion
-
         #region [ Actions / Resources ]
 
         /// <summary>
@@ -42,9 +31,9 @@ namespace CustomerAPI.WebAPI.Controllers
         {
             var result = await FacadeService.CustomerService.GetBy(model);
             // checks for failure in the notification context
-            if (NotificationContext.HasErrorNotifications)
+            if (result.HasErrors)
             {
-                return BadRequest(NotificationContext.ToBusiness<IList<CustomerResult>>());
+                return BadRequest(result);
             }
             else if (result.HasData())
             {
@@ -66,9 +55,9 @@ namespace CustomerAPI.WebAPI.Controllers
         {
             var result = await FacadeService.CustomerService.GetById(id);
             // checks for failure in the notification context
-            if (NotificationContext.HasErrorNotifications)
+            if (result.HasErrors)
             {
-                return BadRequest(NotificationContext.ToBusiness<CustomerIdResult>());
+                return BadRequest(result);
             }
             else if (result.HasData())
             {

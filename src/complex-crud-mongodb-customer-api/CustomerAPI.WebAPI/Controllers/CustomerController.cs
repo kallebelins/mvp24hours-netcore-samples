@@ -7,7 +7,6 @@ using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.DTOs;
 using Mvp24Hours.Core.DTOs.Models;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.WebAPI.Controller;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
@@ -21,7 +20,7 @@ namespace CustomerAPI.WebAPI.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : BaseMvpController
+    public class CustomerController : ControllerBase
     {
         #region [ Actions / Resources ]
 

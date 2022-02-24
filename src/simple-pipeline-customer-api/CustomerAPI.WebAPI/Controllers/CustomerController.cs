@@ -3,13 +3,10 @@ using CustomerAPI.Core.ValueObjects.Customers;
 using CustomerAPI.WebAPI.Pipe.Operations.Customers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
-using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.Infrastructure.Pipe;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.WebAPI.Controller;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -21,7 +18,7 @@ namespace CustomerAPI.WebAPI.Controllers
     [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : BaseMvpController
+    public class CustomerController : ControllerBase
     {
         #region [ Fields / Properties ]
 
@@ -36,8 +33,7 @@ namespace CustomerAPI.WebAPI.Controllers
         /// <summary>
         /// 
         /// </summary>
-        public CustomerController(IPipelineAsync pipeline, ILoggingService logging, INotificationContext notification)
-            : base(logging, notification)
+        public CustomerController(IPipelineAsync pipeline)
         {
             _pipeline = pipeline;
         }
@@ -63,22 +59,26 @@ namespace CustomerAPI.WebAPI.Controllers
             await Pipeline.ExecuteAsync(model.ToMessage());
 
             // try to get response content
-            var result = Pipeline.GetMessage()
-                .GetContent<List<GetByCustomerResponse>>();
+            var message = Pipeline.GetMessage();
 
             // checks for failure in the notification context
-            if (NotificationContext.HasErrorNotifications)
+            if (message.IsFaulty)
             {
-                return BadRequest(NotificationContext.ToBusiness<IList<GetByCustomerResponse>>());
+                return BadRequest(message.Messages.ToBusiness<IList<GetByCustomerResponse>>());
             }
+
+            // get message content
+            var result = message.GetContent<List<GetByCustomerResponse>>();
+
             // checks if there are any records
-            else if (!result.AnyOrNotNull())
+            if (!result.AnySafe())
             {
                 // reply with standard message for record not found
                 return NotFound(Messages.RECORD_NOT_FOUND
                     .ToMessageResult(MessageType.Error)
                         .ToBusiness<IList<GetByCustomerResponse>>());
             }
+
             return Ok(result.ToBusiness());
         }
 
@@ -100,21 +100,25 @@ namespace CustomerAPI.WebAPI.Controllers
             await Pipeline.ExecuteAsync(id.ToMessage("id"));
 
             // try to get response content
-            var result = Pipeline.GetMessage()
-                .GetContent<GetByIdCustomerResponse>();
+            var message = Pipeline.GetMessage();
 
             // checks for failure in the notification context
-            if (NotificationContext.HasErrorNotifications)
+            if (message.IsFaulty)
             {
-                return BadRequest(NotificationContext.ToBusiness<GetByIdCustomerResponse>());
+                return BadRequest(message.Messages.ToBusiness<GetByIdCustomerResponse>());
             }
-            else if (result == null)
+
+            // get message content
+            var result = message.GetContent<GetByIdCustomerResponse>();
+
+            if (result == null)
             {
                 // reply with standard message for record not found
                 return NotFound(Messages.RECORD_NOT_FOUND_FOR_ID
                     .ToMessageResult(MessageType.Error)
                         .ToBusiness<GetByIdCustomerResponse>());
             }
+
             return Ok(result.ToBusiness());
         }
 

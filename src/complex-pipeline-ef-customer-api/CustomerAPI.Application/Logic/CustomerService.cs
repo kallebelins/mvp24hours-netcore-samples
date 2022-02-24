@@ -4,11 +4,8 @@ using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Resources;
 using CustomerAPI.Core.Specifications.Customers;
 using CustomerAPI.Core.ValueObjects.Customers;
-using FluentValidation;
 using Mvp24Hours.Application.Logic;
 using Mvp24Hours.Core.Contract.Data;
-using Mvp24Hours.Core.Contract.Infrastructure.Contexts;
-using Mvp24Hours.Core.Contract.Infrastructure.Logging;
 using Mvp24Hours.Core.Contract.Infrastructure.Pipe;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
@@ -31,8 +28,8 @@ namespace CustomerAPI.Application.Logic
         #endregion
 
         #region [ Ctors ]
-        public CustomerService(IUnitOfWorkAsync unitOfWork, ILoggingService logging, INotificationContext notification, IPipelineAsync pipeline)
-            : base(unitOfWork, logging, notification)
+        public CustomerService(IUnitOfWorkAsync unitOfWork, IPipelineAsync pipeline)
+            : base(unitOfWork)
         {
             this.pipeline = pipeline;
         }
@@ -113,10 +110,13 @@ namespace CustomerAPI.Application.Logic
             // run pipeline
             await pipeline.ExecuteAsync();
 
+            // get message
+            var message = pipeline.GetMessage();
+
             // checks if there is a failure record in context
-            if (NotificationContext.HasErrorNotifications)
+            if (message.IsFaulty)
             {
-                return NotificationContext
+                return message.Messages
                     .ToBusiness<int>(
                         defaultMessage: Messages.OPERATION_FAIL
                             .ToMessageResult(MessageType.Error)
@@ -124,8 +124,7 @@ namespace CustomerAPI.Application.Logic
             }
 
             // try to get response content
-            var numberOfRecords = pipeline.GetMessage()
-                .GetContent<int>("numberOfRecords");
+            var numberOfRecords = message.GetContent<int>("numberOfRecords");
 
             // checks if there are any records
             if (numberOfRecords == 0)

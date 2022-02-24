@@ -1,19 +1,22 @@
 ﻿using CustomerAPI.Application.Brokers.Consumers;
-using CustomerAPI.Application.Brokers.Producers;
 using CustomerAPI.Application.Logic;
 using CustomerAPI.Core.Contract.Logic;
 using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Validations.Customers;
-using CustomerAPI.Core.ValueObjects.Customers;
 using CustomerAPI.Infrastructure.Data;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Mvp24Hours.Core.Enums.Infrastructure;
+using Mvp24Hours.Core.Extensions;
 using Mvp24Hours.Extensions;
 using Mvp24Hours.Helpers;
 using Mvp24Hours.Infrastructure.RabbitMQ;
-using Mvp24Hours.Infrastructure.RabbitMQ.Core.Contract;
+using Mvp24Hours.Infrastructure.RabbitMQ.Configuration;
+using NLog;
+using System;
+using System.Linq;
 
 namespace CustomerAPI.WebAPI.Extensions
 {
@@ -60,6 +63,44 @@ namespace CustomerAPI.WebAPI.Extensions
         /// <summary>
         /// 
         /// </summary>
+        public static IServiceCollection AddMyTelemetry(this IServiceCollection services)
+        {
+            Logger logger = LogManager.GetCurrentClassLogger();
+#if DEBUG
+            services.AddMvp24HoursTelemetry(TelemetryLevel.Information | TelemetryLevel.Verbose,
+                (name, state) =>
+                {
+                    if (name.EndsWith("-object"))
+                    {
+                        logger.Info($"{name}|body:{state.ToSerialize()}");
+                    }
+                    else
+                    {
+                        logger.Info($"{name}|{string.Join("|", state)}");
+                    }
+                }
+            );
+#endif
+            services.AddMvp24HoursTelemetry(TelemetryLevel.Error,
+                (name, state) =>
+                {
+                    if (name.EndsWith("-failure"))
+                    {
+                        logger.Error(state.ElementAtOrDefault(0) as Exception);
+                    }
+                    else
+                    {
+                        logger.Error($"{name}|{string.Join("|", state)}");
+                    }
+                }
+            );
+            services.AddMvp24HoursTelemetryIgnore("rabbitmq-consumer-basic");
+            return services;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public static IServiceCollection AddMyServices(this IServiceCollection services)
         {
             services.AddScoped<ICustomerService, CustomerService>();
@@ -70,22 +111,37 @@ namespace CustomerAPI.WebAPI.Extensions
         /// <summary>
         /// 
         /// </summary>
-        public static IServiceCollection AddMyRabbitProducer(this IServiceCollection services)
+        public static IServiceCollection AddMyRabbitMQ(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<MvpRabbitMQProducer<CustomerCreate>, CreateCustomerProducer>();
-            services.AddScoped<MvpRabbitMQProducer<CustomerUpdate>, UpdateCustomerProducer>();
-            services.AddScoped<MvpRabbitMQProducer<CustomerDelete>, DeleteCustomerProducer>();
-            return services;
-        }
+            services.AddMvp24HoursRabbitMQ(
+                typeof(CreateCustomerConsumer).Assembly,
+                connectionOptions =>
+                {
+                    connectionOptions.ConnectionString = configuration.GetConnectionString("RabbitMQContext");
+                    connectionOptions.DispatchConsumersAsync = true;
+                    connectionOptions.RetryCount = 3;
+                },
+                clientOptions =>
+                {
+                    clientOptions.Exchange = "customer.direct";
+                    clientOptions.MaxRedeliveredCount = 1;
+                    clientOptions.QueueArguments = new System.Collections.Generic.Dictionary<string, object>
+                    {
+                        { "x-queue-mode", "lazy" },
+                        { "x-dead-letter-exchange", "dead-letter-customer.direct" }
+                    };
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public static IServiceCollection AddMyRabbitConsumer(this IServiceCollection services)
-        {
-            services.AddScoped<MvpRabbitMQConsumerAsync<CustomerCreate>, CreateCustomerConsumer>();
-            services.AddScoped<MvpRabbitMQConsumerAsync<CustomerUpdate>, UpdateCustomerConsumer>();
-            services.AddScoped<MvpRabbitMQConsumerAsync<CustomerDelete>, DeleteCustomerConsumer>();
+                    // dead letter exchanges enabled
+                    clientOptions.DeadLetter = new RabbitMQOptions()
+                    {
+                        Exchange = "dead-letter-customer.direct",
+                        QueueArguments = new System.Collections.Generic.Dictionary<string, object>
+                        {
+                            { "x-queue-mode", "lazy" }
+                        }
+                    };
+                }
+            );
             return services;
         }
 
@@ -100,14 +156,8 @@ namespace CustomerAPI.WebAPI.Extensions
                 {
                     if (ServiceProviderHelper.IsReady())
                     {
-                        var createConsumer = ServiceProviderHelper.GetService<MvpRabbitMQConsumerAsync<CustomerCreate>>();
-                        createConsumer?.Consume();
-
-                        var updateConsumer = ServiceProviderHelper.GetService<MvpRabbitMQConsumerAsync<CustomerUpdate>>();
-                        updateConsumer?.Consume();
-
-                        var deteleConsumer = ServiceProviderHelper.GetService<MvpRabbitMQConsumerAsync<CustomerDelete>>();
-                        deteleConsumer?.Consume();
+                        var client = ServiceProviderHelper.GetService<MvpRabbitMQClient>();
+                        client?.Consume();
                     }
                 };
             });

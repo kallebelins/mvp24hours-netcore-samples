@@ -79,6 +79,11 @@
             
             </summary>
         </member>
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyTelemetry(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:CustomerAPI.WebAPI.Models.CustomerFilter">
             <summary>
             Template for customer filter

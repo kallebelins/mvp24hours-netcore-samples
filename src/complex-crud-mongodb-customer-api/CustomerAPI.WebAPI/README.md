@@ -7,7 +7,6 @@ N-tier project used to develop APIs where the business needs to apply complex ru
 - Mapping (AutoMapper); 
 - Logging (NLog); 
 - Patterns for data validation (FluentValidation and Data Annotations);
-- Notification pattern;
 - Specification pattern;
 - Unit of Work (Transaction);
 - Repository (Paging, List, Create, Update, Delete) - Query apply: Filter, Paging - No navigation;
