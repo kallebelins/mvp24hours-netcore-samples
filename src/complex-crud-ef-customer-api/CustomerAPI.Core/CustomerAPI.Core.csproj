@@ -7,7 +7,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="FluentValidation" Version="10.3.6" />
-		<PackageReference Include="Mvp24Hours.Core" Version="3.2.241" />
+		<PackageReference Include="Mvp24Hours.Core" Version="4.1.191" />
 	</ItemGroup>
 
 	<ItemGroup>

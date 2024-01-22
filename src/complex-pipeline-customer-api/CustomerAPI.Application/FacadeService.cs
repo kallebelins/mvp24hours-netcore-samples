@@ -1,5 +1,6 @@
 ﻿using CustomerAPI.Core.Contract.Logic;
-using Mvp24Hours.Helpers;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace CustomerAPI.Application
 {
@@ -8,13 +9,24 @@ namespace CustomerAPI.Application
     /// </summary>
     public class FacadeService
     {
+        #region [ Fields ]
+        private readonly IServiceProvider provider;
+        #endregion
+
+        #region [ Ctor ]
+        public FacadeService(IServiceProvider provider)
+        {
+            this.provider = provider;
+        }
+        #endregion
+
         #region [ Services ]
         /// <summary>
         /// <see cref="CustomerAPI.Core.Contract.Logic.ICustomerService"/>
         /// </summary>
-        public static ICustomerService CustomerService
+        public ICustomerService CustomerService
         {
-            get { return ServiceProviderHelper.GetService<ICustomerService>(); }
+            get { return provider.GetService<ICustomerService>(); }
         }
         #endregion
     }

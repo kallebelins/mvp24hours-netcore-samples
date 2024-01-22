@@ -8,37 +8,36 @@ namespace CustomerAPI.Infrastructure.Builders
     {
         public void Configure(EntityTypeBuilder<Contact> builder)
         {
-            // contact->id
+            builder.ToTable("Contact", "dbo");
+
+            #region [ Primitive members ]
             builder
                 .HasKey(p => p.Id);
-            // contact->created
             builder
                 .Property(p => p.Created)
                 .IsRequired();
-            // contact->customerId
             builder
                 .Property(p => p.CustomerId)
                 .IsRequired();
-            // contact->type
             builder
                 .Property(p => p.Type)
                 .HasConversion<string>()
                 .IsRequired();
-            // contact->description
             builder
                 .Property(p => p.Description)
                 .HasMaxLength(255)
                 .IsRequired();
-            // contact->active
             builder
                 .Property(p => p.Active)
                 .IsRequired();
+            #endregion
 
-            // contact->customer
+            #region [ Relationships members ]
             builder
                 .HasOne(p => p.Customer)
                 .WithMany(p => p.Contacts)
                 .HasForeignKey(p => p.CustomerId);
+            #endregion
         }
     }
 }

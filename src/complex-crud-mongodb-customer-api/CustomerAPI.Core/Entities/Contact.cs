@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace CustomerAPI.Core.Entities
 {
-    public class Contact : EntityBase<Contact, object>
+    public class Contact : EntityBase<object>
     {
         public DateTime Created { get; set; }
         [JsonIgnore]

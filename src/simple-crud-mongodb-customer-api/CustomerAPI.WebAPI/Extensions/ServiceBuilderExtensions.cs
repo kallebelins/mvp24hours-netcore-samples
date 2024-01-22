@@ -5,7 +5,6 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mvp24Hours.Core.Enums.Infrastructure;
-using Mvp24Hours.Core.Extensions;
 using Mvp24Hours.Extensions;
 using NLog;
 using System;
@@ -23,7 +22,7 @@ namespace CustomerAPI.WebAPI.Extensions
         /// </summary>
         public static IServiceCollection AddMyDbContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddMvp24HoursDbContext<CustomerDBContext>(options =>
+            services.AddMvp24HoursDbContext<EFDBContext>(options =>
             {
                 options.DatabaseName = "simplecustomers";
                 options.ConnectionString = configuration.GetConnectionString("MongoDbContext");
@@ -62,7 +61,7 @@ namespace CustomerAPI.WebAPI.Extensions
         {
             Logger logger = LogManager.GetCurrentClassLogger();
 #if DEBUG
-            services.AddMvp24HoursTelemetry(TelemetryLevel.Information | TelemetryLevel.Verbose,
+            services.AddMvp24HoursTelemetry(TelemetryLevels.Information | TelemetryLevels.Verbose,
                 (name, state) =>
                 {
                     if (name.EndsWith("-object"))
@@ -76,7 +75,7 @@ namespace CustomerAPI.WebAPI.Extensions
                 }
             );
 #endif
-            services.AddMvp24HoursTelemetry(TelemetryLevel.Error,
+            services.AddMvp24HoursTelemetry(TelemetryLevels.Error,
                 (name, state) =>
                 {
                     if (name.EndsWith("-failure"))

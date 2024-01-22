@@ -5,7 +5,7 @@ using Mvp24Hours.Core.Contract.Mappings;
 
 namespace CustomerAPI.Core.ValueObjects.Contacts
 {
-    public class ContactUpdate : IMapFrom<Contact>
+    public class ContactUpdate : IMapFrom
     {
         public ContactType Type { get; set; }
         public string Description { get; set; }

@@ -58,7 +58,7 @@ namespace CustomerAPI.WebAPI
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CustomerDBContext db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, EFDBContext db)
         {
             // check environment
             app.UseMvp24HoursExceptionHandling();
@@ -85,8 +85,6 @@ namespace CustomerAPI.WebAPI
             {
                 app.UseMvp24HoursSwagger("Customer Pipeline EF API");
             }
-
-            app.UseMvp24Hours();
         }
     }
 }

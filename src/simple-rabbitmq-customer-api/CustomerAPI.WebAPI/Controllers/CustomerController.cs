@@ -23,6 +23,7 @@ namespace CustomerAPI.WebAPI.Controllers
         #region [ Properties / Fields ]
 
         private readonly MvpRabbitMQClient rabbitMQClient;
+        private readonly FacadeService facade;
 
         #endregion
 
@@ -31,9 +32,10 @@ namespace CustomerAPI.WebAPI.Controllers
         /// <summary>
         /// 
         /// </summary>
-        public CustomerController(MvpRabbitMQClient rabbitMQClient)
+        public CustomerController(MvpRabbitMQClient rabbitMQClient, FacadeService facade)
         {
             this.rabbitMQClient = rabbitMQClient;
+            this.facade = facade;
         }
 
         #endregion
@@ -49,7 +51,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("", Name = "CustomerGetBy")]
         public async Task<ActionResult<IPagingResult<IList<CustomerResult>>>> GetBy([FromQuery] CustomerQuery filter, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
         {
-            var result = await FacadeService.CustomerService.GetBy(filter, pagingCriteria.ToPagingCriteria(), cancellationToken: cancellationToken);
+            var result = await facade.CustomerService.GetBy(filter, pagingCriteria.ToPagingCriteria(), cancellationToken: cancellationToken);
             if (result.HasData())
             {
                 return Ok(result);
@@ -66,7 +68,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{id}", Name = "CustomerGetById")]
         public async Task<ActionResult<IBusinessResult<CustomerIdResult>>> GetById(int id, CancellationToken cancellationToken)
         {
-            var result = await FacadeService.CustomerService.GetById(id, cancellationToken: cancellationToken);
+            var result = await facade.CustomerService.GetById(id, cancellationToken: cancellationToken);
             if (result.HasData())
             {
                 return Ok(result);

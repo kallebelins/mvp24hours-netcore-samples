@@ -19,6 +19,17 @@ namespace CustomerAPI.WebAPI.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
+        #region [ Fields ]
+        private readonly FacadeService facade;
+        #endregion
+
+        #region [ Ctors ]
+        public CustomerController(FacadeService facade)
+        {
+            this.facade = facade;
+        }
+        #endregion
+
         #region [ Actions / Resources ]
 
         /// <summary>
@@ -30,7 +41,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("", Name = "CustomerGetBy")]
         public async Task<ActionResult<IPagingResult<IList<CustomerResult>>>> GetBy([FromQuery] CustomerQuery filter, [FromQuery] PagingCriteriaRequest pagingCriteria, CancellationToken cancellationToken)
         {
-            var result = await FacadeService.CustomerService.GetBy(filter, pagingCriteria.ToPagingCriteria(), cancellationToken: cancellationToken);
+            var result = await facade.CustomerService.GetBy(filter, pagingCriteria.ToPagingCriteria(), cancellationToken: cancellationToken);
             if (result.HasData())
             {
                 return Ok(result);
@@ -47,7 +58,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{id}", Name = "CustomerGetById")]
         public async Task<ActionResult<IBusinessResult<CustomerIdResult>>> GetById(int id, CancellationToken cancellationToken)
         {
-            var result = await FacadeService.CustomerService.GetById(id, cancellationToken: cancellationToken);
+            var result = await facade.CustomerService.GetById(id, cancellationToken: cancellationToken);
             if (result.HasData())
             {
                 return Ok(result);
@@ -64,7 +75,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("RunDataSeed", Name = "CustomerRunDataSeed")]
         public async Task<ActionResult<IBusinessResult<int>>> Create(CancellationToken cancellationToken)
         {
-            var result = await FacadeService.CustomerService.RunDataSeed(cancellationToken: cancellationToken);
+            var result = await facade.CustomerService.RunDataSeed(cancellationToken: cancellationToken);
             if (result.HasErrors)
             {
                 return BadRequest(result);

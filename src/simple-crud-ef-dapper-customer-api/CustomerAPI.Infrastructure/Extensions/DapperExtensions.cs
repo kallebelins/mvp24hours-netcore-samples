@@ -52,7 +52,7 @@ namespace CustomerAPI.Infrastructure.Extensions
         public static async Task<IPagingResult<IEnumerable<T>>> QueryPagingResultAsync<T>(this IDbConnection connection, int limit, int offset, string whereSql = null, dynamic whereParams = null, string orderBySql = "id asc")
             where T : class
         {
-            TelemetryHelper.Execute(TelemetryLevel.Verbose, "dapper-querypagingresultasync-start");
+            TelemetryHelper.Execute(TelemetryLevels.Verbose, "dapper-querypagingresultasync-start");
             try
             {
                 // get number of rows with filter
@@ -96,7 +96,7 @@ namespace CustomerAPI.Infrastructure.Extensions
             }
             finally
             {
-                TelemetryHelper.Execute(TelemetryLevel.Verbose, "dapper-querypagingresultasync-end");
+                TelemetryHelper.Execute(TelemetryLevels.Verbose, "dapper-querypagingresultasync-end");
             }
         }
     }

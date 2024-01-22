@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace CustomerAPI.Core.ValueObjects.Customers
 {
-    public class CustomerResult : IMapFrom<Customer>
+    public class CustomerResult : IMapFrom
     {
         public int Id { get; set; }
         public DateTime Created { get; set; }

@@ -1,4 +1,5 @@
-﻿using CustomerAPI.Application.Logic;
+﻿using CustomerAPI.Application;
+using CustomerAPI.Application.Logic;
 using CustomerAPI.Application.Pipe.Builders;
 using CustomerAPI.Application.Pipe.Operations.Customers;
 using CustomerAPI.Core.Contract.Logic;
@@ -6,7 +7,6 @@ using CustomerAPI.Core.Contract.Pipe.Builders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mvp24Hours.Core.Enums.Infrastructure;
-using Mvp24Hours.Core.Extensions;
 using Mvp24Hours.Extensions;
 using NLog;
 using System;
@@ -22,8 +22,10 @@ namespace CustomerAPI.WebAPI.Extensions
         /// <summary>
         /// 
         /// </summary>
-        public static IServiceCollection AddMyServices(this IServiceCollection services, IConfiguration configuration)
+        public static void AddMyServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<FacadeService>();
+
             services.AddScoped<ICustomerService, CustomerService>();
 
             // pipeline - builders
@@ -34,8 +36,6 @@ namespace CustomerAPI.WebAPI.Extensions
             {
                 return new GetCustomerClientStep(configuration);
             });
-
-            return services;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace CustomerAPI.WebAPI.Extensions
         {
             Logger logger = LogManager.GetCurrentClassLogger();
 #if DEBUG
-            services.AddMvp24HoursTelemetry(TelemetryLevel.Information | TelemetryLevel.Verbose,
+            services.AddMvp24HoursTelemetry(TelemetryLevels.Information | TelemetryLevels.Verbose,
                 (name, state) =>
                 {
                     if (name.EndsWith("-object"))
@@ -59,7 +59,7 @@ namespace CustomerAPI.WebAPI.Extensions
                 }
             );
 #endif
-            services.AddMvp24HoursTelemetry(TelemetryLevel.Error,
+            services.AddMvp24HoursTelemetry(TelemetryLevels.Error,
                 (name, state) =>
                 {
                     if (name.EndsWith("-failure"))

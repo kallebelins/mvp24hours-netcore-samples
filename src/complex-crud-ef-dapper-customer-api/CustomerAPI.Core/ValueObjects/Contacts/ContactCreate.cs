@@ -2,11 +2,12 @@
 using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Enums;
 using Mvp24Hours.Core.Contract.Mappings;
+using Mvp24Hours.Extensions;
 using System;
 
 namespace CustomerAPI.Core.ValueObjects.Contacts
 {
-    public class ContactCreate : IMapFrom<Contact>
+    public class ContactCreate : IMapFrom
     {
         public ContactType Type { get; set; }
         public string Description { get; set; }
@@ -14,8 +15,8 @@ namespace CustomerAPI.Core.ValueObjects.Contacts
         public virtual void Mapping(Profile profile)
         {
             profile.CreateMap<ContactCreate, Contact>()
-                .ForMember(x => x.Created, opt => opt.MapFrom(y => DateTime.Now))
-                .ForMember(x => x.Active, opt => opt.MapFrom(y => true));
+                .MapProperty(x => DateTime.Now, x => x.Created)
+                .MapProperty(x => true, x => x.Active);
         }
     }
 }

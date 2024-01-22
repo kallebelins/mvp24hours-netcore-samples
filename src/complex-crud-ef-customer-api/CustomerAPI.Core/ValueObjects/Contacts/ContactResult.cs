@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace CustomerAPI.Core.ValueObjects.Contacts
 {
-    public class ContactResult : IMapFrom<Contact>
+    public class ContactResult : IMapFrom
     {
         public DateTime Created { get; set; }
         public ContactType Type { get; set; }
@@ -16,8 +16,7 @@ namespace CustomerAPI.Core.ValueObjects.Contacts
 
         public virtual void Mapping(Profile profile)
         {
-            profile.CreateMap<Contact, ContactResult>()
-                .ForMember(x => x.Created, opt => opt.MapFrom(y => y.Created));
+            profile.CreateMap<Contact, ContactResult>();
             profile.CreateMap<List<Contact>, List<ContactResult>>();
         }
     }

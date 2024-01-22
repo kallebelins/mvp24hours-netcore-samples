@@ -1,4 +1,5 @@
-﻿using CustomerAPI.Application.Logic;
+﻿using CustomerAPI.Application;
+using CustomerAPI.Application.Logic;
 using CustomerAPI.Core.Contract.Logic;
 using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Validations.Customers;
@@ -8,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mvp24Hours.Core.Enums.Infrastructure;
-using Mvp24Hours.Core.Extensions;
 using Mvp24Hours.Extensions;
 using NLog;
 using System;
@@ -26,10 +26,10 @@ namespace CustomerAPI.WebAPI.Extensions
         /// </summary>
         public static IServiceCollection AddMyDbContext(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<CustomerDBContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("CustomerDbContext"))
+            services.AddDbContext<EFDBContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("EFDBContext"))
             );
-            services.AddMvp24HoursDbContext<CustomerDBContext>();
+            services.AddMvp24HoursDbContext<EFDBContext>();
             services.AddMvp24HoursRepositoryAsync(options: options =>
             {
                 options.MaxQtyByQueryPage = 100;
@@ -41,27 +41,28 @@ namespace CustomerAPI.WebAPI.Extensions
         /// <summary>
         /// 
         /// </summary>
-        public static IServiceCollection AddMyHealthChecks(this IServiceCollection services, IConfiguration configuration)
+        public static void AddMyServices(this IServiceCollection services)
         {
-            services.AddHealthChecks()
-                .AddSqlServer(
-                    configuration.GetConnectionString("CustomerDbContext"),
-                    healthQuery: "SELECT 1;",
-                    name: "SqlServer",
-                    failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded);
-            return services;
-        }
+            services.AddScoped<FacadeService>();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public static IServiceCollection AddMyServices(this IServiceCollection services)
-        {
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IContactService, ContactService>();
 
             services.AddSingleton<IValidator<Customer>, CustomerValidator>();
             services.AddSingleton<IValidator<Contact>, ContactValidator>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IServiceCollection AddMyHealthChecks(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHealthChecks()
+                .AddSqlServer(
+                    configuration.GetConnectionString("EFDBContext"),
+                    healthQuery: "SELECT 1;",
+                    name: "SqlServer",
+                    failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded);
             return services;
         }
 
@@ -72,7 +73,7 @@ namespace CustomerAPI.WebAPI.Extensions
         {
             Logger logger = LogManager.GetCurrentClassLogger();
 #if DEBUG
-            services.AddMvp24HoursTelemetry(TelemetryLevel.Information | TelemetryLevel.Verbose,
+            services.AddMvp24HoursTelemetry(TelemetryLevels.Information | TelemetryLevels.Verbose,
                 (name, state) =>
                 {
                     if (name.EndsWith("-object"))
@@ -86,7 +87,7 @@ namespace CustomerAPI.WebAPI.Extensions
                 }
             );
 #endif
-            services.AddMvp24HoursTelemetry(TelemetryLevel.Error,
+            services.AddMvp24HoursTelemetry(TelemetryLevels.Error,
                 (name, state) =>
                 {
                     if (name.EndsWith("-failure"))

@@ -69,12 +69,12 @@
             
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyHealthChecks(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyHealthChecks(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             
             </summary>
@@ -82,21 +82,6 @@
         <member name="M:CustomerAPI.WebAPI.Extensions.ServiceBuilderExtensions.AddMyTelemetry(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             
-            </summary>
-        </member>
-        <member name="T:CustomerAPI.WebAPI.Models.CustomerFilter">
-            <summary>
-            Template for customer filter
-            </summary>
-        </member>
-        <member name="P:CustomerAPI.WebAPI.Models.CustomerFilter.Name">
-            <summary>
-            Client name
-            </summary>
-        </member>
-        <member name="P:CustomerAPI.WebAPI.Models.CustomerFilter.Active">
-            <summary>
-            Indicates whether the client is active/inactive
             </summary>
         </member>
         <member name="T:CustomerAPI.WebAPI.Program">
@@ -135,7 +120,7 @@
             This method gets called by the runtime. Use this method to add services to the container.
             </summary>
         </member>
-        <member name="M:CustomerAPI.WebAPI.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,CustomerAPI.Infrastructure.Data.CustomerDBContext)">
+        <member name="M:CustomerAPI.WebAPI.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
             <summary>
             This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
             </summary>

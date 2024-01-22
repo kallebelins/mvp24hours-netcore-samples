@@ -80,8 +80,6 @@ namespace CustomerAPI.WebAPI
             {
                 app.UseMvp24HoursSwagger("Customer MongoDB API");
             }
-
-            app.UseMvp24Hours();
         }
     }
 }

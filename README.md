@@ -5,11 +5,6 @@ In each project there is a file with the description of the resources and implem
 ## Study, share and contribute:
 Visit: https://mvp24hours.dev/
 
-## Templates for Visual Studio 2019 and 2022
-Visit: https://github.com/kallebelins/mvp24hours-netcore-samples/tree/main/vstemplate
-
-![Templates for Visual Studio 2019 and 2022](https://raw.githubusercontent.com/kallebelins/mvp24hours-netcore-samples/main/images/mvp24hours-netcore-samples-resume.png)
-
 ## Projects - NLayers
 
 ### Simple
@@ -82,7 +77,7 @@ We generally use it for service integration. The pipeline concept is excellent f
 Please consider donating if you think this library is useful to you or that my work is valuable. Glad if you can help me [buy a cup of coffee](https://www.paypal.com/donate/?hosted_button_id=EKA2L256GJVQC). :heart:
 
 ## Community
-Users, stakeholders, students, enthusiasts, developers, programmers [connect on Telegram](https://t.me/+6_sL0y2TE-ZkMmZh) to follow our growth closely!
+Users, interested parties, students, enthusiasts, developers, programmers [connect on LinkedIn](https://www.linkedin.com/in/kallebelins/) to closely follow our growth!
 
 ## Sponsors
 Be a sponsor by choosing this project to accelerate your products.

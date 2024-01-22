@@ -1,4 +1,3 @@
-using CustomerAPI.Infrastructure.Data;
 using CustomerAPI.WebAPI.Extensions;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
@@ -57,13 +56,10 @@ namespace CustomerAPI.WebAPI
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, CustomerDBContext db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // check environment
             app.UseMvp24HoursExceptionHandling();
-
-            // automatic migration
-            db.Database.EnsureCreated();
 
             app.UseStaticFiles();
             app.UseRouting();
@@ -84,8 +80,6 @@ namespace CustomerAPI.WebAPI
             {
                 app.UseMvp24HoursSwagger("Customer EF Entity Log API");
             }
-
-            app.UseMvp24Hours();
         }
     }
 }

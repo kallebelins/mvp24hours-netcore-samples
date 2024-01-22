@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace CustomerAPI.Core.Entities
 {
-    public class Contact : EntityBaseLog<Contact, int, string>
+    public class Contact : EntityBaseLog<int, string>
     {
         [JsonIgnore]
         public int CustomerId { get; set; }

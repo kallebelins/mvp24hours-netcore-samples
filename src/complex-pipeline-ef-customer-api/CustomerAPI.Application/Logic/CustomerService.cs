@@ -1,4 +1,5 @@
-﻿using CustomerAPI.Application.Pipe.Operations.Customers;
+﻿using AutoMapper;
+using CustomerAPI.Application.Pipe.Operations.Customers;
 using CustomerAPI.Core.Contract.Logic;
 using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Resources;
@@ -24,14 +25,16 @@ namespace CustomerAPI.Application.Logic
         #region [ Fields / Properties ]
 
         private readonly IPipelineAsync pipeline;
+        private readonly IMapper mapper;
 
         #endregion
 
         #region [ Ctors ]
-        public CustomerService(IUnitOfWorkAsync unitOfWork, IPipelineAsync pipeline)
+        public CustomerService(IUnitOfWorkAsync unitOfWork, IPipelineAsync pipeline, IMapper mapper)
             : base(unitOfWork)
         {
             this.pipeline = pipeline;
+            this.mapper = mapper;
         }
         #endregion
 
@@ -75,12 +78,13 @@ namespace CustomerAPI.Application.Logic
             if (!result.HasData())
             {
                 // reply with standard message for record not found
-                return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
+                return Messages.RECORD_NOT_FOUND
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND), MessageType.Error)
                     .ToBusinessPaging<IList<CustomerResult>>();
             }
 
             // apply mapping
-            return result.MapPagingTo<IList<Customer>, IList<CustomerResult>>();
+            return mapper.MapPagingTo<IList<Customer>, IList<CustomerResult>>(result);
         }
 
         public async Task<IBusinessResult<CustomerIdResult>> GetById(int id, CancellationToken cancellationToken = default)
@@ -90,8 +94,8 @@ namespace CustomerAPI.Application.Logic
             paging.NavigationExpr.Add(x => x.Contacts);
 
             // try to retrieve identifier with navigation property
-            return await GetByIdAsync(id, paging, cancellationToken)
-                .MapBusinessToAsync<Customer, CustomerIdResult>();
+            return await mapper
+                .MapBusinessToAsync<Customer, CustomerIdResult>(GetByIdAsync(id, paging, cancellationToken));
         }
 
         #endregion
@@ -119,7 +123,7 @@ namespace CustomerAPI.Application.Logic
                 return message.Messages
                     .ToBusiness<int>(
                         defaultMessage: Messages.OPERATION_FAIL
-                            .ToMessageResult(MessageType.Error)
+                            .ToMessageResult(nameof(Messages.OPERATION_FAIL), MessageType.Error)
                 );
             }
 
@@ -131,13 +135,13 @@ namespace CustomerAPI.Application.Logic
             {
                 // reply with standard message for record not found
                 return Messages.RECORD_NOT_FOUND
-                    .ToMessageResult(MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND), MessageType.Error)
                         .ToBusiness<int>();
             }
 
             return numberOfRecords.ToBusiness(
                 Messages.OPERATION_SUCCESS
-                    .ToMessageResult("RunDataSeed", MessageType.Success));
+                    .ToMessageResult(nameof(Messages.OPERATION_SUCCESS), MessageType.Success));
         }
 
         #endregion

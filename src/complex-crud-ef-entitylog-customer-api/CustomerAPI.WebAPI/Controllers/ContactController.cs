@@ -1,5 +1,6 @@
 ﻿using CustomerAPI.Application;
 using CustomerAPI.Core.Entities;
+using CustomerAPI.Core.Resources;
 using CustomerAPI.Core.ValueObjects.Contacts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,17 @@ namespace CustomerAPI.WebAPI.Controllers
     [ApiController]
     public class ContactController : ControllerBase
     {
+        #region [ Fields ]
+        private readonly FacadeService facade;
+        #endregion
+
+        #region [ Ctors ]
+        public ContactController(FacadeService facade)
+        {
+            this.facade = facade;
+        }
+        #endregion
+
         #region [ Actions / Resources ]
 
         /// <summary>
@@ -31,7 +43,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{customerId:int}/Contact", Name = "ContactGetBy")]
         public async Task<ActionResult<IBusinessResult<IList<Contact>>>> GetBy(int customerId, CancellationToken cancellationToken)
         {
-            var result = await FacadeService.ContactService.GetBy(customerId, cancellationToken: cancellationToken);
+            var result = await facade.ContactService.GetBy(customerId, cancellationToken: cancellationToken);
             if (result.HasData())
             {
                 return Ok(result);
@@ -48,7 +60,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{customerId:int}/Contact", Name = "ContactCreate")]
         public async Task<ActionResult<IBusinessResult<IList<int>>>> Create(int customerId, [FromBody] ContactCreate model, CancellationToken cancellationToken)
         {
-            var result = await FacadeService.ContactService.Create(customerId, model, cancellationToken: cancellationToken);
+            var result = await facade.ContactService.Create(customerId, model, cancellationToken: cancellationToken);
             if (result.HasErrors)
             {
                 return BadRequest(result);
@@ -67,10 +79,10 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{customerId:int}/Contact/{id}", Name = "ContactUpdate")]
         public async Task<ActionResult<IBusinessResult<IList<int>>>> Update(int customerId, int id, [FromBody] ContactUpdate model, CancellationToken cancellationToken)
         {
-            var result = await FacadeService.ContactService.Update(customerId, id, model, cancellationToken: cancellationToken);
+            var result = await facade.ContactService.Update(customerId, id, model, cancellationToken: cancellationToken);
             if (result.HasErrors)
             {
-                if (result.HasMessageKey("NotFound"))
+                if (result.HasMessageKey(nameof(Messages.RECORD_NOT_FOUND_FOR_ID)))
                 {
                     return NotFound(result);
                 }
@@ -93,10 +105,10 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{customerId:int}/Contact/{id}", Name = "ContactDelete")]
         public async Task<ActionResult<IBusinessResult<IList<int>>>> Delete(int customerId, int id, CancellationToken cancellationToken)
         {
-            var result = await FacadeService.ContactService.Delete(customerId, id, cancellationToken: cancellationToken);
+            var result = await facade.ContactService.Delete(customerId, id, cancellationToken: cancellationToken);
             if (result.HasErrors)
             {
-                if (result.HasMessageKey("NotFound"))
+                if (result.HasMessageKey(nameof(Messages.RECORD_NOT_FOUND_FOR_ID)))
                 {
                     return NotFound(result);
                 }

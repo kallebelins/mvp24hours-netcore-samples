@@ -16,6 +16,8 @@ N-tier project used to develop APIs where the business needs to apply complex ru
 - Using ActionResult for API resources (Restful);
 - Middlewares for handling unmanaged failures;
 - DDD concepts;
+- Migrations;
+- Initial data load (seed);
 
 ## Layers:
 
@@ -71,7 +73,7 @@ Install-Package MySql.EntityFrameworkCore -Version 5.0.8
 
 /// Startup.cs
 services.AddDbContext<DataContext>(options =>
-    options.UseMySQL(configuration.GetConnectionString("CustomerDbContext"))
+    options.UseMySQL(configuration.GetConnectionString("EFDBContext"))
 );
 ```
 
@@ -95,7 +97,7 @@ Install-Package AspNetCore.HealthChecks.SqlServer -Version 3.2.0
 /// ServiceBuilderExtensions
 services.AddHealthChecks()
 	.AddSqlServer(
-		configuration.GetConnectionString("CustomerDbContext"),
+		configuration.GetConnectionString("EFDBContext"),
 		healthQuery: "SELECT 1;",
 		name: "SqlServer", 
 		failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded);
@@ -111,7 +113,7 @@ Install-Package AspNetCore.HealthChecks.Npgsql -Version 3.1.1
 /// ServiceBuilderExtensions
 services.AddHealthChecks()
 	.AddNpgSql(
-		configuration.GetConnectionString("CustomerDbContext"),
+		configuration.GetConnectionString("EFDBContext"),
 		name: "PostgreSql", 
 		failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded);
 
@@ -126,7 +128,7 @@ Install-Package AspNetCore.HealthChecks.MySql -Version 3.2.0
 /// ServiceBuilderExtensions
 services.AddHealthChecks()
 	.AddMySql(
-		configuration.GetConnectionString("CustomerDbContext"), 
+		configuration.GetConnectionString("EFDBContext"), 
 		name: "MySql", 
 		failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded);
 ```

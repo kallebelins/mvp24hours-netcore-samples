@@ -1,6 +1,8 @@
+using CustomerAPI.Infrastructure.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Mvp24Hours.Extensions;
 using NLog.Web;
 using System;
 
@@ -20,7 +22,13 @@ namespace CustomerAPI.WebAPI
             try
             {
                 logger.Debug("Application Starting Up");
-                CreateHostBuilder(args).Build().Run();
+                CreateHostBuilder(args)
+                    .Build()
+                    .MigrateDatabase<EFDBContext>((context, services) =>
+                    {
+                        EFDBContextSeed.SeedAsync(context).Wait();
+                    })
+                    .Run();
             }
             catch (Exception exception)
             {

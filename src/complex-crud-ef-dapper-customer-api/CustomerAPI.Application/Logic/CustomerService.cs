@@ -1,4 +1,5 @@
-﻿using CustomerAPI.Core.Contract.Logic;
+﻿using AutoMapper;
+using CustomerAPI.Core.Contract.Logic;
 using CustomerAPI.Core.Entities;
 using CustomerAPI.Core.Resources;
 using CustomerAPI.Core.ValueObjects.Customers;
@@ -10,7 +11,7 @@ using Mvp24Hours.Core.Contract.Data;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,11 +21,16 @@ namespace CustomerAPI.Application.Logic
 {
     public class CustomerService : RepositoryPagingServiceAsync<Customer, IUnitOfWorkAsync>, ICustomerService
     {
+        #region [ Fields ]
+        private readonly IMapper mapper;
+        #endregion
+
         #region [ Ctor ]
 
-        public CustomerService(IUnitOfWorkAsync unitOfWork, IValidator<Customer> validator)
+        public CustomerService(IUnitOfWorkAsync unitOfWork, IValidator<Customer> validator, IMapper mapper)
             : base(unitOfWork, validator)
         {
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         #endregion
@@ -70,12 +76,13 @@ namespace CustomerAPI.Application.Logic
             if (result == null || result.Summary.TotalCount == 0)
             {
                 // reply with standard message for record not found
-                return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
+                return Messages.RECORD_NOT_FOUND
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND), MessageType.Error)
                     .ToBusinessPaging<IEnumerable<CustomerResult>>();
             }
 
-            return result
-                .MapPagingTo<IEnumerable<Customer>, IEnumerable<CustomerResult>>();
+            return mapper
+                .MapPagingTo<IEnumerable<Customer>, IEnumerable<CustomerResult>>(result);
         }
 
         public async Task<IBusinessResult<CustomerIdResult>> GetById(int id, CancellationToken cancellationToken = default)
@@ -101,12 +108,14 @@ namespace CustomerAPI.Application.Logic
             if (model == null)
             {
                 // reply with standard message for record not found
-                return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
+                return Messages.RECORD_NOT_FOUND
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND), MessageType.Error)
                     .ToBusiness<CustomerIdResult>();
             }
 
             // map result
-            return model.MapTo<CustomerIdResult>()
+            return mapper
+                .Map<CustomerIdResult>(model)
                 .ToBusiness();
         }
 
@@ -116,7 +125,7 @@ namespace CustomerAPI.Application.Logic
 
         public async Task<IBusinessResult<int>> Create(CustomerCreate dto, CancellationToken cancellationToken = default)
         {
-            var entity = dto.MapTo<Customer>();
+            var entity = mapper.Map<Customer>(dto);
 
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
             var errors = entity.TryValidate(Validator);
@@ -131,12 +140,12 @@ namespace CustomerAPI.Application.Logic
             {
                 return entity.Id.ToBusiness(
                     Messages.OPERATION_SUCCESS
-                        .ToMessageResult("CustomerCreate", MessageType.Success));
+                        .ToMessageResult(nameof(Messages.OPERATION_SUCCESS), MessageType.Success));
             }
 
             // unknown error
             return Messages.OPERATION_FAIL
-                .ToMessageResult(MessageType.Error)
+                .ToMessageResult(nameof(Messages.OPERATION_FAIL), MessageType.Error)
                 .ToBusiness<int>();
         }
 
@@ -147,12 +156,12 @@ namespace CustomerAPI.Application.Logic
             if (entity == null)
             {
                 return Messages.RECORD_NOT_FOUND_FOR_ID
-                    .ToMessageResult("NotFound", MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND_FOR_ID), MessageType.Error)
                         .ToBusiness<int>();
             }
 
             // entity populating with DTO properties
-            AutoMapperHelper.Map<Customer>(entity, dto);
+            mapper.Map(dto, entity);
 
             // apply data validation to the model/entity with FluentValidation or DataAnnotation
             var errors = entity.TryValidate(Validator);
@@ -168,12 +177,12 @@ namespace CustomerAPI.Application.Logic
             {
                 return affectedRows.ToBusiness(
                     Messages.OPERATION_SUCCESS
-                        .ToMessageResult("Update", MessageType.Success));
+                        .ToMessageResult(nameof(Messages.OPERATION_SUCCESS), MessageType.Success));
             }
 
             // unknown error
             return Messages.OPERATION_FAIL
-                .ToMessageResult(MessageType.Error)
+                .ToMessageResult(nameof(Messages.OPERATION_FAIL), MessageType.Error)
                 .ToBusiness<int>();
         }
 
@@ -184,7 +193,7 @@ namespace CustomerAPI.Application.Logic
             if (entity == null)
             {
                 return Messages.RECORD_NOT_FOUND_FOR_ID
-                    .ToMessageResult("NotFound", MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND_FOR_ID), MessageType.Error)
                         .ToBusiness<int>();
             }
 
@@ -195,12 +204,12 @@ namespace CustomerAPI.Application.Logic
             {
                 return affectedRows.ToBusiness(
                     Messages.OPERATION_SUCCESS
-                        .ToMessageResult("Delete", MessageType.Success));
+                        .ToMessageResult(nameof(Messages.OPERATION_SUCCESS), MessageType.Success));
             }
 
             // unknown error
             return Messages.OPERATION_FAIL
-                .ToMessageResult(MessageType.Error)
+                .ToMessageResult(nameof(Messages.OPERATION_FAIL), MessageType.Error)
                 .ToBusiness<int>();
         }
 

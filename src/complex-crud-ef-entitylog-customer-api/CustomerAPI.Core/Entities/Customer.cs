@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CustomerAPI.Core.Entities
 {
-    public class Customer : EntityBaseLog<Contact, int, string>
+    public class Customer : EntityBaseLog<int, string>
     {
         public string Name { get; set; }
         public string Note { get; set; }

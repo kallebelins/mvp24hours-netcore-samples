@@ -69,7 +69,8 @@ namespace CustomerAPI.Application.Logic
             if (!result.HasData())
             {
                 // reply with standard message for record not found
-                return Messages.RECORD_NOT_FOUND.ToMessageResult(MessageType.Error)
+                return Messages.RECORD_NOT_FOUND
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND), MessageType.Error)
                     .ToBusinessPaging<IList<Customer>>();
             }
 
@@ -109,12 +110,12 @@ namespace CustomerAPI.Application.Logic
             {
                 return entityModel.Id.ToBusiness(
                     Messages.OPERATION_SUCCESS
-                        .ToMessageResult("CustomerCreate", MessageType.Success));
+                        .ToMessageResult(nameof(Messages.OPERATION_SUCCESS), MessageType.Success));
             }
 
             // unknown error
             return Messages.OPERATION_FAIL
-                .ToMessageResult(MessageType.Error)
+                .ToMessageResult(nameof(Messages.OPERATION_FAIL), MessageType.Error)
                 .ToBusiness<int>();
         }
 
@@ -125,7 +126,7 @@ namespace CustomerAPI.Application.Logic
             if (entityDb == null)
             {
                 return Messages.RECORD_NOT_FOUND_FOR_ID
-                    .ToMessageResult("NotFound", MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND_FOR_ID), MessageType.Error)
                         .ToBusiness<int>();
             }
 
@@ -150,12 +151,12 @@ namespace CustomerAPI.Application.Logic
             {
                 return affectedRows.ToBusiness(
                     Messages.OPERATION_SUCCESS
-                        .ToMessageResult("Update", MessageType.Success));
+                        .ToMessageResult(nameof(Messages.OPERATION_SUCCESS), MessageType.Success));
             }
 
             // unknown error
             return Messages.OPERATION_FAIL
-                .ToMessageResult(MessageType.Error)
+                .ToMessageResult(nameof(Messages.OPERATION_FAIL), MessageType.Error)
                 .ToBusiness<int>();
         }
 
@@ -166,7 +167,7 @@ namespace CustomerAPI.Application.Logic
             if (entity == null)
             {
                 return Messages.RECORD_NOT_FOUND_FOR_ID
-                    .ToMessageResult("NotFound", MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND_FOR_ID), MessageType.Error)
                         .ToBusiness<int>();
             }
 
@@ -177,12 +178,12 @@ namespace CustomerAPI.Application.Logic
             {
                 return affectedRows.ToBusiness(
                     Messages.OPERATION_SUCCESS
-                        .ToMessageResult("Delete", MessageType.Success));
+                        .ToMessageResult(nameof(Messages.OPERATION_SUCCESS), MessageType.Success));
             }
 
             // unknown error
             return Messages.OPERATION_FAIL
-                .ToMessageResult(MessageType.Error)
+                .ToMessageResult(nameof(Messages.OPERATION_FAIL), MessageType.Error)
                 .ToBusiness<int>();
         }
 

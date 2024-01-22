@@ -4,7 +4,7 @@ using Mvp24Hours.Core.Contract.Mappings;
 
 namespace CustomerAPI.Core.ValueObjects.Customers
 {
-    public class CustomerIdResult : CustomerResult, IMapFrom<Customer>
+    public class CustomerIdResult : CustomerResult, IMapFrom
     {
         public string CellPhone { get; set; }
         public string Email { get; set; }

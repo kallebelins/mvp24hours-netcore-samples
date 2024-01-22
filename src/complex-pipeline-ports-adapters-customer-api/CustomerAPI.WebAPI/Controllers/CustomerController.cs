@@ -17,6 +17,17 @@ namespace CustomerAPI.WebAPI.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
+        #region [ Fields ]
+        private readonly FacadeService facade;
+        #endregion
+
+        #region [ Ctors ]
+        public CustomerController(FacadeService facade)
+        {
+            this.facade = facade;
+        }
+        #endregion
+
         #region [ Actions / Resources ]
 
         /// <summary>
@@ -29,7 +40,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("", Name = "CustomerGetBy")]
         public async Task<ActionResult<IBusinessResult<IList<CustomerResult>>>> GetBy([FromQuery] CustomerQuery model)
         {
-            var result = await FacadeService.CustomerService.GetBy(model);
+            var result = await facade.CustomerService.GetBy(model);
             // checks for failure in the notification context
             if (result.HasErrors)
             {
@@ -53,7 +64,7 @@ namespace CustomerAPI.WebAPI.Controllers
         [Route("{id}", Name = "CustomerGetById")]
         public async Task<ActionResult<IBusinessResult<CustomerIdResult>>> GetById(int id)
         {
-            var result = await FacadeService.CustomerService.GetById(id);
+            var result = await facade.CustomerService.GetById(id);
             // checks for failure in the notification context
             if (result.HasErrors)
             {

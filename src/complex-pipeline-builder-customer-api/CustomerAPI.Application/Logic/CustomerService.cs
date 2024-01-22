@@ -2,11 +2,12 @@
 using CustomerAPI.Core.Contract.Pipe.Builders;
 using CustomerAPI.Core.Resources;
 using CustomerAPI.Core.ValueObjects.Customers;
+using Microsoft.Extensions.DependencyInjection;
 using Mvp24Hours.Core.Contract.Infrastructure.Pipe;
 using Mvp24Hours.Core.Contract.ValueObjects.Logic;
 using Mvp24Hours.Core.Enums;
 using Mvp24Hours.Extensions;
-using Mvp24Hours.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace CustomerAPI.Application.Logic
     {
         #region [ Fields / Properties ]
 
-        private readonly IPipelineAsync pipeline;
+        private readonly IServiceProvider provider;
 
         #endregion
 
@@ -25,9 +26,9 @@ namespace CustomerAPI.Application.Logic
         /// <summary>
         /// 
         /// </summary>
-        public CustomerService(IPipelineAsync _pipeline)
+        public CustomerService(IPipelineAsync _pipeline, IServiceProvider provider)
         {
-            pipeline = _pipeline;
+            this.provider = provider;
         }
 
         #endregion
@@ -38,8 +39,10 @@ namespace CustomerAPI.Application.Logic
         {
             // note: IGetByCustomerBuilder can be injected through class constructor as class member
 
+            var pipeline = provider.GetService<IPipelineAsync>();
+
             // add operations/steps with IGetByCustomerBuilder builder
-            ServiceProviderHelper.GetService<IGetByCustomerBuilder>()
+            provider.GetService<IGetByCustomerBuilder>()
                 ?.Builder(pipeline);
 
             // run pipeline with package with content (int -> id)
@@ -54,7 +57,7 @@ namespace CustomerAPI.Application.Logic
             {
                 // reply with standard message for record not found
                 return Messages.RECORD_NOT_FOUND
-                    .ToMessageResult(MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND), MessageType.Error)
                         .ToBusiness<IList<CustomerResult>>();
             }
 
@@ -64,9 +67,10 @@ namespace CustomerAPI.Application.Logic
         public async Task<IBusinessResult<CustomerIdResult>> GetById(int id)
         {
             // note: IGetByIdCustomerBuilder can be injected through class constructor as class member
+            var pipeline = provider.GetService<IPipelineAsync>();
 
             // add operations/steps with IGetByCustomerBuilder builder
-            ServiceProviderHelper.GetService<IGetByIdCustomerBuilder>()
+            provider.GetService<IGetByIdCustomerBuilder>()
                 ?.Builder(pipeline);
 
             // run pipeline with package with content (int -> id)
@@ -81,7 +85,7 @@ namespace CustomerAPI.Application.Logic
             {
                 // reply with standard message for record not found
                 return Messages.RECORD_NOT_FOUND_FOR_ID
-                    .ToMessageResult(MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND_FOR_ID), MessageType.Error)
                         .ToBusiness<CustomerIdResult>();
             }
             return result.ToBusiness();

@@ -78,8 +78,6 @@ namespace CustomerAPI.WebAPI
             {
                 app.UseMvp24HoursSwagger("Customer Pipeline Builder API");
             }
-
-            app.UseMvp24Hours();
         }
     }
 }

@@ -72,7 +72,7 @@ namespace CustomerAPI.WebAPI.Controllers
             {
                 // reply with standard message for record not found
                 return NotFound(Messages.RECORD_NOT_FOUND
-                    .ToMessageResult(MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND), MessageType.Error)
                         .ToBusiness<IList<Contact>>());
             }
 
@@ -104,7 +104,7 @@ namespace CustomerAPI.WebAPI.Controllers
             return BadRequest(errors
                 .ToBusiness<Contact>(
                     defaultMessage: Messages.OPERATION_FAIL
-                        .ToMessageResult(MessageType.Error))
+                        .ToMessageResult(nameof(Messages.OPERATION_FAIL), MessageType.Error))
             );
         }
 
@@ -130,7 +130,7 @@ namespace CustomerAPI.WebAPI.Controllers
                 if (modelDb == null)
                 {
                     return NotFound(Messages.RECORD_NOT_FOUND_FOR_ID
-                        .ToMessageResult(MessageType.Error)
+                        .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND_FOR_ID), MessageType.Error)
                             .ToBusiness<Contact>());
                 }
 
@@ -154,7 +154,7 @@ namespace CustomerAPI.WebAPI.Controllers
             return BadRequest(errors
                 .ToBusiness<Contact>(
                     defaultMessage: Messages.OPERATION_FAIL
-                        .ToMessageResult(MessageType.Error))
+                        .ToMessageResult(nameof(Messages.OPERATION_FAIL), MessageType.Error))
             );
         }
 
@@ -174,7 +174,7 @@ namespace CustomerAPI.WebAPI.Controllers
             if (model == null)
             {
                 return NotFound(Messages.RECORD_NOT_FOUND_FOR_ID
-                    .ToMessageResult(MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND_FOR_ID), MessageType.Error)
                         .ToBusiness<Contact>());
             }
 
@@ -183,12 +183,12 @@ namespace CustomerAPI.WebAPI.Controllers
             if (await unitOfWork.SaveChangesAsync(cancellationToken) > 0)
             {
                 return Ok(Messages.OPERATION_SUCCESS
-                    .ToMessageResult(MessageType.Success)
+                    .ToMessageResult(nameof(Messages.OPERATION_SUCCESS), MessageType.Success)
                         .ToBusiness<Contact>());
             }
             // get message in request context, if not, use default message
             return BadRequest(Messages.OPERATION_FAIL
-                .ToMessageResult(MessageType.Error)
+                .ToMessageResult(nameof(Messages.OPERATION_FAIL), MessageType.Error)
                 .ToBusiness<Contact>()
             );
         }

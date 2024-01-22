@@ -51,7 +51,7 @@ namespace CustomerAPI.Application.Logic
             {
                 // reply with standard message for record not found
                 return Messages.RECORD_NOT_FOUND
-                    .ToMessageResult(MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND), MessageType.Error)
                         .ToBusiness<IList<CustomerResult>>();
             }
 
@@ -76,7 +76,7 @@ namespace CustomerAPI.Application.Logic
             {
                 // reply with standard message for record not found
                 return Messages.RECORD_NOT_FOUND_FOR_ID
-                    .ToMessageResult(MessageType.Error)
+                    .ToMessageResult(nameof(Messages.RECORD_NOT_FOUND_FOR_ID), MessageType.Error)
                         .ToBusiness<CustomerIdResult>();
             }
             return result.ToBusiness();

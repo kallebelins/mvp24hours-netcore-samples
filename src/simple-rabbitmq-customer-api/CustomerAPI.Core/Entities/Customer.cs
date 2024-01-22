@@ -3,7 +3,7 @@ using System;
 
 namespace CustomerAPI.Core.Entities
 {
-    public class Customer : EntityBase<Customer, int>
+    public class Customer : EntityBase<int>
     {
         public DateTime Created { get; set; }
         public string Name { get; set; }

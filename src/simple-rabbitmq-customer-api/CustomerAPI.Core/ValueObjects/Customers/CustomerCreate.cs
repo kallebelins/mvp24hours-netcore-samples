@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using CustomerAPI.Core.Entities;
 using Mvp24Hours.Core.Contract.Mappings;
+using Mvp24Hours.Extensions;
 using System;
 
 namespace CustomerAPI.Core.ValueObjects.Customers
 {
-    public class CustomerCreate : IMapFrom<Customer>
+    public class CustomerCreate : IMapFrom
     {
         public string Name { get; set; }
         public string CellPhone { get; set; }
@@ -15,7 +16,7 @@ namespace CustomerAPI.Core.ValueObjects.Customers
         public virtual void Mapping(Profile profile)
         {
             profile.CreateMap<CustomerCreate, Customer>()
-                .ForMember(x => x.Created, opt => opt.MapFrom(y => DateTime.Now));
+                .MapProperty(x => DateTime.Now, x => x.Created);
         }
     }
 }

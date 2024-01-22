@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace CustomerAPI.Core.ValueObjects.Customers
 {
-    public class CustomerResult : IMapFrom<Customer>
+    public class CustomerResult : IMapFrom
     {
         public int Id { get; set; }
         public DateTime Created { get; set; }
@@ -16,8 +16,7 @@ namespace CustomerAPI.Core.ValueObjects.Customers
 
         public virtual void Mapping(Profile profile)
         {
-            profile.CreateMap<Customer, CustomerResult>()
-                .ForMember(x => x.Created, opt => opt.MapFrom(y => y.Created));
+            profile.CreateMap<Customer, CustomerResult>();
             profile.CreateMap<List<Customer>, List<CustomerResult>>();
         }
     }

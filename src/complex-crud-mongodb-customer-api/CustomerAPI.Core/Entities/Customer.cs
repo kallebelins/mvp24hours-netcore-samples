@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CustomerAPI.Core.Entities
 {
-    public class Customer : EntityBase<Customer, object>
+    public class Customer : EntityBase<object>
     {
         public DateTime Created { get; set; }
         public string Name { get; set; }
